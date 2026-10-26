@@ -1,294 +1,486 @@
-{% extends 'web/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
 
-{% block content %}
-<div class="max-w-4xl mx-auto px-4 py-8 md:py-12 relative z-10">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Ignite 2K26 | NRCM National Level Project Expo</title>
+    <meta name="description"
+        content="Register your team for Ignite 2K26 - National Level Project Expo Challenge at Narsimha Reddy Engineering College (NRCM).">
 
-    <!-- Form Container in Clean Light Glass Style -->
-    <div class="glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/90 shadow-glass"
-        data-aos="fade-up" data-aos-duration="800">
+    <!-- Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-        <!-- Header -->
-        <div class="text-center max-w-xl mx-auto mb-10">
-            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#ff3b5c] text-xs font-bold uppercase tracking-wider mb-2">
-                Team Registration
-            </span>
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
-                Register for <span class="text-sunset-gradient">Ignite 2K26</span>
-            </h1>
-            <p class="text-slate-500 text-sm mt-2">Fill in your team details and upload your project abstract to secure your participation slot.</p>
-        </div>
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-        <!-- Django Messages -->
-        {% if messages %}
-        <div class="mb-8 space-y-3">
-            {% for message in messages %}
-            <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 flex items-center gap-3 text-sm font-semibold shadow-sm">
-                <i class="ri-error-warning-line text-lg text-rose-600"></i>
-                <span>{{ message }}</span>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            coral: '#ff3b5c',
+                            rose: '#ff4d6d',
+                            orange: '#ff7849',
+                            purple: '#8b5cf6',
+                            dark: '#0c1322',
+                        },
+                        surface: {
+                            bg: '#faf8fc',
+                            card: 'rgba(255, 255, 255, 0.85)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Outfit"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float-slow': 'float 8s ease-in-out infinite',
+                    },
+                    boxShadow: {
+                        'glass': '0 20px 50px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+                        'glass-hover': '0 25px 60px rgba(0, 0, 0, 0.09), 0 2px 6px rgba(0, 0, 0, 0.03)',
+                        'pill': '0 4px 14px rgba(12, 19, 34, 0.15)',
+                        'pill-rose': '0 8px 24px rgba(255, 59, 92, 0.35)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-sunset-gradient {
+                background: linear-gradient(135deg, #ff3b5c 0%, #ff7849 50%, #8b5cf6 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .glass-card {
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.9);
+            }
+        }
+    </style>
+</head>
 
-        <form method="POST" enctype="multipart/form-data" id="regForm" class="space-y-10">
-            {% csrf_token %}
+<body class="bg-[#faf8fc] text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-700 overflow-x-hidden min-h-screen relative flex flex-col justify-between">
 
-            <!-- Section 1: Project Details -->
-            <div class="space-y-6">
-                <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
-                    <span class="w-8 h-8 rounded-xl bg-rose-50 text-[#ff3b5c] font-black text-sm flex items-center justify-center">1</span>
-                    <h3 class="text-lg font-extrabold text-slate-900 font-display">Project Information</h3>
-                </div>
-
-                <!-- Project Title -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Project Title *</label>
-                    <input type="text" name="project_title" required placeholder="e.g. Smart IoT Grid Monitoring System"
-                        class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 transition-all text-sm font-medium">
-                </div>
-
-                <!-- College Selection -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Institution / College Name *</label>
-                    <div class="relative">
-                        <select name="college_selection" id="collegeSelect" onchange="toggleCollegeInput()"
-                            class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 appearance-none cursor-pointer transition-all text-sm font-medium">
-                            <option value="NRCM">Narsimha Reddy Engineering College (NRCM)</option>
-                            <option value="OTHER">Other College / Institution</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                            <i class="ri-arrow-down-s-line text-lg"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Other College Name Input (Dynamic) -->
-                <div id="otherCollegeGroup" class="hidden space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Enter Your College Name *</label>
-                    <input type="text" name="college_name_other" placeholder="e.g. Osmania University / JNTUH / BITS"
-                        class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 transition-all text-sm font-medium">
-                </div>
-            </div>
-
-            <!-- Section 2: Team Members -->
-            <div class="space-y-6">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-200 flex-wrap gap-4">
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-xl bg-purple-50 text-[#8b5cf6] font-black text-sm flex items-center justify-center">2</span>
-                        <h3 class="text-lg font-extrabold text-slate-900 font-display">Team Composition (2-6 Members)</h3>
-                    </div>
-
-                    <!-- Team Size Select -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Size:</span>
-                        <div class="relative">
-                            <select name="team_size" id="teamSize" onchange="generateTeamMembers()"
-                                class="px-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer pr-8">
-                                <option value="2">2 Members</option>
-                                <option value="3">3 Members</option>
-                                <option value="4">4 Members</option>
-                                <option value="5">5 Members</option>
-                                <option value="6">6 Members</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
-                                <i class="ri-arrow-down-s-line"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="teamMembersContainer" class="space-y-5">
-                    <!-- Dynamic Member Rows injected by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Section 3: Uploads & Payment -->
-            <div class="space-y-6">
-                <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
-                    <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 font-black text-sm flex items-center justify-center">3</span>
-                    <h3 class="text-lg font-extrabold text-slate-900 font-display">Document & Payment Details</h3>
-                </div>
-
-                <!-- Abstract / Project Document -->
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Project Abstract Document (PDF/Docx) *</label>
-                        {% load static %}
-                        <a href="{% static 'web/docs/Sample_Abstract.docx' %}" download class="text-xs font-semibold text-[#ff3b5c] hover:underline flex items-center gap-1">
-                            <i class="ri-download-line"></i> Need Template?
-                        </a>
-                    </div>
-                    <input type="file" name="project_document" required accept=".pdf,.doc,.docx"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-slate-950 file:text-white hover:file:bg-slate-800 cursor-pointer transition-all text-xs">
-                </div>
-
-                <!-- Payment Section for Non-NRCM Students (Dynamic) -->
-                <div id="paymentSection" class="hidden space-y-5 p-6 rounded-2xl bg-gradient-to-br from-rose-50/60 to-purple-50/60 border border-rose-200/80">
-                    <div class="flex items-center gap-2 text-[#ff3b5c] font-bold text-sm">
-                        <i class="ri-bank-card-line text-lg"></i>
-                        <span>Registration Fee Payment (Non-NRCM)</span>
-                    </div>
-                    <p class="text-xs text-slate-600">Please pay Rs. 250/- per participant via UPI/Bank transfer and attach proof below.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Transaction ID (UTR) *</label>
-                            <input type="text" name="transaction_id" id="transactionIdInput" placeholder="e.g. 12-digit UTR Number"
-                                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Payment Screenshot *</label>
-                            <input type="file" name="payment_screenshot" id="screenshotInput" accept="image/*"
-                                class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#ff3b5c] file:text-white cursor-pointer text-xs">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Button (Pill shaped, matching theme) -->
-            <div class="pt-6">
-                <button type="submit"
-                    class="w-full py-4 rounded-full bg-slate-950 text-white font-extrabold text-sm sm:text-base uppercase tracking-wider hover:bg-slate-800 shadow-pill hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
-                    <span>Submit & Confirm Team Registration</span>
-                    <i class="ri-arrow-right-line"></i>
-                </button>
-            </div>
-        </form>
+    <!-- Aurora Mesh Background -->
+    <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-[#faf8fc]">
+        <div class="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-[#ffe4e6] via-[#fed7aa] to-[#fce7f3] opacity-70 filter blur-[90px] top-[-120px] left-[-100px] animate-pulse-slow"></div>
+        <div class="absolute w-[650px] h-[650px] rounded-full bg-gradient-to-bl from-[#e9d5ff] via-[#f5d0fe] to-[#fbcfe8] opacity-80 filter blur-[100px] top-[5%] right-[-140px]"></div>
+        <div class="absolute w-[450px] h-[450px] rounded-full bg-[#fef3c7] opacity-40 filter blur-[80px] top-[45%] left-[-80px]"></div>
+        <div class="absolute w-[550px] h-[550px] rounded-full bg-gradient-to-tl from-[#e0e7ff] via-[#f3e8ff] to-[#ffe4e6] opacity-60 filter blur-[90px] bottom-[-100px] right-[5%]"></div>
     </div>
-</div>
 
-<script>
-    function toggleCollegeInput() {
-        const select = document.getElementById('collegeSelect');
-        const otherInput = document.getElementById('otherCollegeGroup');
-        const paymentSection = document.getElementById('paymentSection');
-        const transInput = document.getElementById('transactionIdInput');
-        const screenInput = document.getElementById('screenshotInput');
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-4 md:px-8 py-3.5 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_rgba(0,0,0,0.02)] transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center gap-3.5 group">
+                <div class="h-11 px-2.5 py-1 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center gap-2 group-hover:border-slate-300 transition-colors">
+                    <img src="{% static 'web/images/nrcm_logo.png' %}" alt="NRCM Logo" class="h-7 w-auto object-contain">
+                </div>
+                <div class="flex flex-col leading-none">
+                    <span class="text-xl md:text-2xl font-black text-slate-950 tracking-wider uppercase font-display">IGNITE</span>
+                    <span class="text-[9px] md:text-[10px] font-extrabold text-[#ff3b5c] tracking-[0.22em] uppercase mt-0.5">2K26 EDITION</span>
+                </div>
+            </a>
 
-        if (select.value === 'OTHER') {
-            otherInput.classList.remove('hidden');
-            otherInput.querySelector('input').required = true;
+            <!-- Center Navigation Links -->
+            <div class="hidden lg:flex items-center gap-8">
+                <a href="/" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Home</a>
+                <a href="/#gallery" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Gallery</a>
+                <a href="/#domains" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Domains</a>
+                <a href="/#guidelines" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Guidelines</a>
+                <a href="/#prizes" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Prizes</a>
+                <a href="/#team" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Team</a>
+            </div>
 
-            // Show payment section
-            paymentSection.classList.remove('hidden');
-            transInput.required = true;
-            screenInput.required = true;
-        } else {
-            otherInput.classList.add('hidden');
-            otherInput.querySelector('input').required = false;
+            <!-- Right CTA Button -->
+            <div class="hidden md:flex items-center gap-3">
+                <a href="/" class="px-6 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2">
+                    <i class="ri-arrow-left-line"></i>
+                    Back to Home
+                </a>
+            </div>
 
-            // Hide payment section
-            paymentSection.classList.add('hidden');
-            transInput.required = false;
-            screenInput.required = false;
-            transInput.value = '';
-            screenInput.value = '';
-        }
-    }
+            <!-- Mobile Menu Toggle Button -->
+            <button class="lg:hidden w-10 h-10 rounded-xl bg-slate-100/80 flex items-center justify-center text-slate-800 text-2xl focus:outline-none" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
+                <i class="ri-menu-3-line" id="menuIcon"></i>
+            </button>
+        </div>
+    </nav>
 
-    function createMemberHtml(i) {
-        const isLeader = i === 1;
-        return `
-            <div id="member_${i}" class="bg-white/90 p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 transition-all" data-aos="fade-up">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider ${isLeader ? 'text-[#ff3b5c]' : 'text-slate-700'}">
-                        ${isLeader ? '<i class="ri-shield-star-fill text-sm"></i> Member 1 (Team Leader)' : `Member ${i}`}
+    <!-- Mobile Menu Drawer -->
+    <div id="mobileMenu" class="fixed inset-0 z-40 bg-white/95 backdrop-blur-2xl transform translate-x-full transition-transform duration-300 lg:hidden flex flex-col items-center justify-center gap-6 p-6">
+        <a href="/" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Home</a>
+        <a href="/#gallery" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Gallery</a>
+        <a href="/#domains" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Domains</a>
+        <a href="/#guidelines" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Guidelines</a>
+        <a href="/#prizes" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Prizes</a>
+        <a href="/#team" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Team</a>
+
+        <div class="pt-6 w-full max-w-xs flex flex-col gap-3">
+            <a href="/" onclick="toggleMobileMenu()" class="w-full text-center py-3.5 bg-slate-950 text-white font-bold text-sm uppercase tracking-wider rounded-full shadow-md">
+                Back to Home
+            </a>
+            <a href="{% static 'web/docs/Sample_Abstract.docx' %}" download class="w-full text-center py-3 bg-white border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-full">
+                Download Abstract
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="pt-24 pb-12 flex-grow">
+        <div class="max-w-4xl mx-auto px-4 py-4 md:py-8 relative z-10">
+
+            <!-- Form Container in Clean Light Glass Style -->
+            <div class="glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/90 shadow-glass" data-aos="fade-up" data-aos-duration="800">
+
+                <!-- Header -->
+                <div class="text-center max-w-xl mx-auto mb-10">
+                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#ff3b5c] text-xs font-bold uppercase tracking-wider mb-2">
+                        Team Registration
                     </span>
-                    <span class="text-[11px] font-semibold text-slate-400">Student ${i} of ${document.getElementById('teamSize').value}</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight font-display">
+                        Register for <span class="text-sunset-gradient">Ignite 2K26</span>
+                    </h1>
+                    <p class="text-slate-500 text-sm mt-2">Fill in your team details and upload your project abstract to secure your participation slot.</p>
                 </div>
 
-                <div class="space-y-3.5">
-                    <!-- Full Name -->
-                    <input type="text" name="member_name_${i}" placeholder="Full Name *" required
-                        class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+                <!-- Django Messages -->
+                {% if messages %}
+                <div class="mb-8 space-y-3">
+                    {% for message in messages %}
+                    <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 flex items-center gap-3 text-sm font-semibold shadow-sm">
+                        <i class="ri-error-warning-line text-lg text-rose-600"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
 
-                    <!-- Email & Mobile -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <input type="email" name="member_email_${i}" placeholder="College Email ID *" required
-                            class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
-                        <input type="tel" name="member_mobile_${i}" placeholder="WhatsApp Mobile (10 digits) *" pattern="[6-9][0-9]{9}" maxlength="10" required
-                            class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+                <form method="POST" enctype="multipart/form-data" id="regForm" class="space-y-10">
+                    {% csrf_token %}
+
+                    <!-- Section 1: Project Details -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
+                            <span class="w-8 h-8 rounded-xl bg-rose-50 text-[#ff3b5c] font-black text-sm flex items-center justify-center">1</span>
+                            <h3 class="text-lg font-extrabold text-slate-900 font-display">Project Information</h3>
+                        </div>
+
+                        <!-- Project Title -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Project Title *</label>
+                            <input type="text" name="project_title" required placeholder="e.g. Smart IoT Grid Monitoring System"
+                                class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 transition-all text-sm font-medium">
+                        </div>
+
+                        <!-- College Selection -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Institution / College Name *</label>
+                            <div class="relative">
+                                <select name="college_selection" id="collegeSelect" onchange="toggleCollegeInput()"
+                                    class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 appearance-none cursor-pointer transition-all text-sm font-medium">
+                                    <option value="NRCM">Narsimha Reddy Engineering College (NRCM)</option>
+                                    <option value="OTHER">Other College / Institution</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
+                                    <i class="ri-arrow-down-s-line text-lg"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other College Name Input (Dynamic) -->
+                        <div id="otherCollegeGroup" class="hidden space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Enter Your College Name *</label>
+                            <input type="text" name="college_name_other" placeholder="e.g. Osmania University / JNTUH / BITS"
+                                class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 transition-all text-sm font-medium">
+                        </div>
                     </div>
 
-                    <!-- Roll No & Department -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <input type="text" name="member_roll_${i}" placeholder="Hall Ticket / Roll No *" required
-                            class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
-                        <div class="relative">
-                            <select name="member_dept_${i}" required
-                                class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer text-xs font-medium pr-8">
-                                <option value="" disabled selected>Select Department *</option>
-                                <option value="CSE">Computer Science (CSE)</option>
-                                <option value="AIML">CSE (AI & ML)</option>
-                                <option value="CSE-CS">CSE (Cyber Security)</option>
-                                <option value="CSE-DS">CSE (Data Science)</option>
-                                <option value="IT">Information Technology (IT)</option>
-                                <option value="ECE">Electronics & Comm. (ECE)</option>
-                                <option value="EEE">Electrical & Electronics (EEE)</option>
-                                <option value="MECH">Mechanical Engineering (MECH)</option>
-                                <option value="CIVIL">Civil Engineering (CIVIL)</option>
-                                <option value="MBA">MBA</option>
-                                <option value="MCA">MCA</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                                <i class="ri-arrow-down-s-line"></i>
+                    <!-- Section 2: Team Members -->
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-200 flex-wrap gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-xl bg-purple-50 text-[#8b5cf6] font-black text-sm flex items-center justify-center">2</span>
+                                <h3 class="text-lg font-extrabold text-slate-900 font-display">Team Composition (2-6 Members)</h3>
+                            </div>
+
+                            <!-- Team Size Select -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Size:</span>
+                                <div class="relative">
+                                    <select name="team_size" id="teamSize" onchange="generateTeamMembers()"
+                                        class="px-4 py-2 bg-slate-100 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer pr-8">
+                                        <option value="2">2 Members</option>
+                                        <option value="3">3 Members</option>
+                                        <option value="4">4 Members</option>
+                                        <option value="5">5 Members</option>
+                                        <option value="6">6 Members</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
+                                        <i class="ri-arrow-down-s-line"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="teamMembersContainer" class="space-y-5">
+                            <!-- Dynamic Member Rows injected by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Uploads & Payment -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
+                            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 font-black text-sm flex items-center justify-center">3</span>
+                            <h3 class="text-lg font-extrabold text-slate-900 font-display">Document & Payment Details</h3>
+                        </div>
+
+                        <!-- Abstract / Project Document -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Project Abstract Document (PDF/Docx) *</label>
+                                <a href="{% static 'web/docs/Sample_Abstract.docx' %}" download class="text-xs font-semibold text-[#ff3b5c] hover:underline flex items-center gap-1">
+                                    <i class="ri-download-line"></i> Need Template?
+                                </a>
+                            </div>
+                            <input type="file" name="project_document" required accept=".pdf,.doc,.docx"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-slate-950 file:text-white hover:file:bg-slate-800 cursor-pointer transition-all text-xs">
+                        </div>
+
+                        <!-- Payment Section for Non-NRCM Students (Dynamic) -->
+                        <div id="paymentSection" class="hidden space-y-5 p-6 rounded-2xl bg-gradient-to-br from-rose-50/60 to-purple-50/60 border border-rose-200/80">
+                            <div class="flex items-center gap-2 text-[#ff3b5c] font-bold text-sm">
+                                <i class="ri-bank-card-line text-lg"></i>
+                                <span>Registration Fee Payment (Non-NRCM)</span>
+                            </div>
+                            <p class="text-xs text-slate-600">Please pay Rs. 250/- per participant via UPI/Bank transfer and attach proof below.</p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Transaction ID (UTR) *</label>
+                                    <input type="text" name="transaction_id" id="transactionIdInput" placeholder="e.g. 12-digit UTR Number"
+                                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Payment Screenshot *</label>
+                                    <input type="file" name="payment_screenshot" id="screenshotInput" accept="image/*"
+                                        class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#ff3b5c] file:text-white cursor-pointer text-xs">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- T-shirt & Food Preference -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <div class="relative">
-                            <select name="member_tshirt_${i}" required
-                                class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer text-xs font-medium pr-8">
-                                <option value="" disabled selected>Select T-Shirt Size *</option>
-                                <option value="S">Small (S)</option>
-                                <option value="M">Medium (M)</option>
-                                <option value="L">Large (L)</option>
-                                <option value="XL">Extra Large (XL)</option>
-                                <option value="XXL">XXL</option>
-                                <option value="XXXL">XXXL</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                                <i class="ri-arrow-down-s-line"></i>
-                            </div>
-                        </div>
-                        <div class="relative">
-                            <select name="member_food_${i}" required
-                                class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer text-xs font-medium pr-8">
-                                <option value="" disabled selected>Lunch Preference *</option>
-                                <option value="VEG">Vegetarian</option>
-                                <option value="NON-VEG">Non-Vegetarian</option>
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                                <i class="ri-arrow-down-s-line"></i>
-                            </div>
-                        </div>
+                    <!-- Submit Button -->
+                    <div class="pt-6">
+                        <button type="submit"
+                            class="w-full py-4 rounded-full bg-slate-950 text-white font-extrabold text-sm sm:text-base uppercase tracking-wider hover:bg-slate-800 shadow-pill hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
+                            <span>Submit & Confirm Team Registration</span>
+                            <i class="ri-arrow-right-line"></i>
+                        </button>
                     </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section (Without Organizers) -->
+    <footer class="relative z-10 py-10 border-t border-slate-200/80 bg-white/70">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+                <div>
+                    <h5 class="text-lg font-black text-slate-900 tracking-wider">NARSIMHA REDDY ENGINEERING COLLEGE</h5>
+                    <p class="text-slate-500 text-xs mt-1">UGC Autonomous · Maisammaguda (V), Kompally - 500100, Hyderabad, Telangana.</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 hover:text-white hover:bg-slate-950 flex items-center justify-center transition-all duration-300" aria-label="Facebook">
+                        <i class="ri-facebook-fill"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 hover:text-white hover:bg-[#ff3b5c] flex items-center justify-center transition-all duration-300" aria-label="Instagram">
+                        <i class="ri-instagram-line"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 hover:text-white hover:bg-blue-600 flex items-center justify-center transition-all duration-300" aria-label="LinkedIn">
+                        <i class="ri-linkedin-fill"></i>
+                    </a>
+                    <a href="/admin/" class="px-5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1.5">
+                        <i class="ri-shield-user-line"></i> Admin
+                    </a>
                 </div>
             </div>
-        `;
-    }
+            <div class="mt-8 text-center text-xs text-slate-400">
+                © 2026 IGNITE · All Rights Reserved. <a href="https://pashamdhanushreddy.github.io/E-Portfolio/" target="_blank" rel="noopener noreferrer" class="hover:text-[#ff3b5c] transition-colors font-medium">Designed and Developed by PashamDhanushReddy (23X01A05S4)</a>
+            </div>
+        </div>
+    </footer>
 
-    function generateTeamMembers() {
-        const size = parseInt(document.getElementById('teamSize').value);
-        const container = document.getElementById('teamMembersContainer');
-        container.innerHTML = '';
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 700,
+            once: true,
+            offset: 40,
+            easing: 'ease-out-cubic',
+        });
 
-        for (let i = 1; i <= size; i++) {
-            container.insertAdjacentHTML('beforeend', createMemberHtml(i));
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('menuIcon');
+            const body = document.body;
+
+            if (menu.classList.contains('translate-x-full')) {
+                menu.classList.remove('translate-x-full');
+                icon.classList.remove('ri-menu-3-line');
+                icon.classList.add('ri-close-line');
+                body.classList.add('overflow-hidden');
+            } else {
+                menu.classList.add('translate-x-full');
+                icon.classList.remove('ri-close-line');
+                icon.classList.add('ri-menu-3-line');
+                body.classList.remove('overflow-hidden');
+            }
         }
-    }
 
-    // Initialize with default 2 members
-    generateTeamMembers();
-</script>
+        function toggleCollegeInput() {
+            const select = document.getElementById('collegeSelect');
+            const otherInput = document.getElementById('otherCollegeGroup');
+            const paymentSection = document.getElementById('paymentSection');
+            const transInput = document.getElementById('transactionIdInput');
+            const screenInput = document.getElementById('screenshotInput');
 
-{% block footer %}
-<footer class="mt-20 py-8 border-t border-slate-200/80 text-center text-xs text-slate-500">
-    <p class="font-bold text-slate-800">Narsimha Reddy Engineering College (UGC Autonomous)</p>
-    <p class="mt-1 text-slate-400">© 2026 IGNITE · Need assistance? Reach out to the Faculty Coordinators on campus.</p>
-</footer>
-{% endblock %}
-{% endblock %}
+            if (select.value === 'OTHER') {
+                otherInput.classList.remove('hidden');
+                otherInput.querySelector('input').required = true;
+
+                // Show payment section
+                paymentSection.classList.remove('hidden');
+                transInput.required = true;
+                screenInput.required = true;
+            } else {
+                otherInput.classList.add('hidden');
+                otherInput.querySelector('input').required = false;
+
+                // Hide payment section
+                paymentSection.classList.add('hidden');
+                transInput.required = false;
+                screenInput.required = false;
+                transInput.value = '';
+                screenInput.value = '';
+            }
+        }
+
+        function createMemberHtml(i) {
+            const isLeader = i === 1;
+            return `
+                <div id="member_${i}" class="bg-white/90 p-5 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 transition-all" data-aos="fade-up">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider ${isLeader ? 'text-[#ff3b5c]' : 'text-slate-700'}">
+                            ${isLeader ? '<i class="ri-shield-star-fill text-sm"></i> Member 1 (Team Leader)' : `Member ${i}`}
+                        </span>
+                        <span class="text-[11px] font-semibold text-slate-400">Student ${i} of ${document.getElementById('teamSize').value}</span>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <!-- Full Name -->
+                        <input type="text" name="member_name_${i}" placeholder="Full Name *" required
+                            class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+
+                        <!-- Email & Mobile -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <input type="email" name="member_email_${i}" placeholder="College Email ID *" required
+                                class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+                            <input type="tel" name="member_mobile_${i}" placeholder="WhatsApp Mobile (10 digits) *" pattern="[6-9][0-9]{9}" maxlength="10" required
+                                class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+                        </div>
+
+                        <!-- Roll No & Department -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <input type="text" name="member_roll_${i}" placeholder="Hall Ticket / Roll No *" required
+                                class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
+                            <div class="relative">
+                                <select name="member_dept_${i}" required
+                                    class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer text-xs font-medium pr-8">
+                                    <option value="" disabled selected>Department *</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="AIML">AIML</option>
+                                    <option value="CSE-CS">CSE-CS</option>
+                                    <option value="CSE-DS">CSE-DS</option>
+                                    <option value="IT">IT</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                    <i class="ri-arrow-down-s-line"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- T-shirt & Food Preference -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div class="relative">
+                                <select name="member_tshirt_${i}" required
+                                    class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer text-xs font-medium pr-8">
+                                    <option value="" disabled selected>Select T-Shirt Size *</option>
+                                    <option value="S">Small (S)</option>
+                                    <option value="M">Medium (M)</option>
+                                    <option value="L">Large (L)</option>
+                                    <option value="XL">Extra Large (XL)</option>
+                                    <option value="XXL">XXL</option>
+                                    <option value="XXXL">XXXL</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                    <i class="ri-arrow-down-s-line"></i>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <select name="member_food_${i}" required
+                                    class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-[#ff3b5c] appearance-none cursor-pointer text-xs font-medium pr-8">
+                                    <option value="" disabled selected>Lunch Preference *</option>
+                                    <option value="VEG">Vegetarian</option>
+                                    <option value="NON-VEG">Non-Vegetarian</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                    <i class="ri-arrow-down-s-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateTeamMembers() {
+            const size = parseInt(document.getElementById('teamSize').value);
+            const container = document.getElementById('teamMembersContainer');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= size; i++) {
+                container.insertAdjacentHTML('beforeend', createMemberHtml(i));
+            }
+        }
+
+        // Initialize with default 2 members
+        generateTeamMembers();
+    </script>
+</body>
+
+</html>

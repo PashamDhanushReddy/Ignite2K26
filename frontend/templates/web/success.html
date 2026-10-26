@@ -1,37 +1,149 @@
-{% extends 'web/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
 
-{% block content %}
-<div class="min-h-[72vh] flex items-center justify-center px-4 py-16 relative z-10">
-    <div class="max-w-xl w-full mx-auto glass-card p-8 sm:p-12 rounded-3xl border border-white/90 shadow-glass text-center animate-fade-in" data-aos="zoom-in" data-aos-duration="600">
-        <!-- Success Icon -->
-        <div class="w-20 h-20 mx-auto rounded-3xl bg-emerald-50 text-emerald-500 border border-emerald-100 flex items-center justify-center text-4xl mb-6 shadow-sm">
-            <i class="ri-checkbox-circle-fill"></i>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful - Ignite 2K26</title>
 
-        <span class="inline-block px-4 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold uppercase tracking-widest mb-3">
-            Registration Confirmed
-        </span>
+    <!-- Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-950 font-display mb-4">
-            You're In for <span class="text-sunset-gradient">Ignite 2K26!</span>
-        </h1>
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-        <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto">
-            Your team registration has been successfully recorded. Please keep your project presentation and prototype ready for the grand offline expo on <strong class="text-slate-900 font-bold">February 24, 2026</strong>.
-        </p>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            coral: '#ff3b5c',
+                            rose: '#ff4d6d',
+                            orange: '#ff7849',
+                            purple: '#8b5cf6',
+                            dark: '#0c1322',
+                        },
+                        surface: {
+                            bg: '#faf8fc',
+                            card: 'rgba(255, 255, 255, 0.85)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Outfit"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glass': '0 20px 50px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02)',
+                        'pill': '0 4px 14px rgba(12, 19, 34, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-sunset-gradient {
+                background: linear-gradient(135deg, #ff3b5c 0%, #ff7849 50%, #8b5cf6 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .glass-card {
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.9);
+            }
+        }
+    </style>
+</head>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="/"
-                class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-slate-950 text-white font-bold text-sm tracking-wide hover:bg-slate-800 shadow-pill transition-all duration-300 inline-flex items-center justify-center gap-2">
-                <i class="ri-home-5-line"></i>
-                <span>Return to Home</span>
-            </a>
-            <a href="/register/"
-                class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white border border-slate-200 text-slate-800 font-bold text-sm tracking-wide hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center gap-2">
-                <i class="ri-add-line"></i>
-                <span>Register Another Team</span>
-            </a>
-        </div>
+<body class="bg-[#faf8fc] text-slate-800 font-sans antialiased min-h-screen relative flex flex-col justify-between">
+
+    <!-- Aurora Mesh Background -->
+    <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-[#faf8fc]">
+        <div class="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-[#ffe4e6] via-[#fed7aa] to-[#fce7f3] opacity-70 filter blur-[90px] top-[-120px] left-[-100px]"></div>
+        <div class="absolute w-[650px] h-[650px] rounded-full bg-gradient-to-bl from-[#e9d5ff] via-[#f5d0fe] to-[#fbcfe8] opacity-80 filter blur-[100px] top-[5%] right-[-140px]"></div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-4 md:px-8 py-3.5 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3.5">
+                <div class="h-11 px-2.5 py-1 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center gap-2">
+                    <img src="{% static 'web/images/nrcm_logo.png' %}" alt="NRCM Logo" class="h-7 w-auto object-contain">
+                </div>
+                <div class="flex flex-col leading-none">
+                    <span class="text-xl md:text-2xl font-black text-slate-950 tracking-wider uppercase font-display">IGNITE</span>
+                    <span class="text-[9px] md:text-[10px] font-extrabold text-[#ff3b5c] tracking-[0.22em] uppercase mt-0.5">2K26 EDITION</span>
+                </div>
+            </a>
+            <a href="/" class="px-6 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2">
+                <i class="ri-home-5-line"></i> Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="pt-28 pb-12 flex-grow flex items-center justify-center">
+        <div class="max-w-xl w-full mx-4 glass-card p-8 sm:p-12 rounded-3xl border border-white/90 shadow-glass text-center animate-fade-in" data-aos="zoom-in" data-aos-duration="600">
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-emerald-50 text-emerald-500 border border-emerald-100 flex items-center justify-center text-4xl mb-6 shadow-sm">
+                <i class="ri-checkbox-circle-fill"></i>
+            </div>
+
+            <span class="inline-block px-4 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold uppercase tracking-widest mb-3">
+                Registration Confirmed
+            </span>
+
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-950 font-display mb-4">
+                You're In for <span class="text-sunset-gradient">Ignite 2K26!</span>
+            </h1>
+
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto">
+                Your team registration has been successfully recorded. Please keep your project presentation and prototype ready for the grand offline expo on <strong class="text-slate-900 font-bold">February 24, 2026</strong>.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="/" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-slate-950 text-white font-bold text-sm tracking-wide hover:bg-slate-800 shadow-pill transition-all duration-300 inline-flex items-center justify-center gap-2">
+                    <i class="ri-home-5-line"></i>
+                    <span>Return to Home</span>
+                </a>
+                <a href="/register/" class="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white border border-slate-200 text-slate-800 font-bold text-sm tracking-wide hover:bg-slate-50 transition-all duration-300 inline-flex items-center justify-center gap-2">
+                    <i class="ri-add-line"></i>
+                    <span>Register Another Team</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-10 border-t border-slate-200/80 bg-white/70">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+                <div>
+                    <h5 class="text-lg font-black text-slate-900 tracking-wider">NARSIMHA REDDY ENGINEERING COLLEGE</h5>
+                    <p class="text-slate-500 text-xs mt-1">UGC Autonomous · Maisammaguda (V), Kompally - 500100, Hyderabad, Telangana.</p>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-xs text-slate-400">
+                © 2026 IGNITE · All Rights Reserved. <a href="https://pashamdhanushreddy.github.io/E-Portfolio/" target="_blank" rel="noopener noreferrer" class="hover:text-[#ff3b5c] transition-colors font-medium">Designed and Developed by PashamDhanushReddy (23X01A05S4)</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 700, once: true });
+    </script>
+</body>
+
+</html>
