@@ -26,6 +26,14 @@ class Registration(models.Model):
     transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True, help_text="UTR ID")
     payment_screenshot = CloudinaryField('image', blank=True, null=True)
     project_document = CloudinaryField('raw', resource_type='raw')
+    SELECTION_STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('selected', 'Selected'),
+        ('rejected', 'Rejected'),
+    ]
+
+    project_category = models.CharField(max_length=255, blank=True, default='')
+    selection_status = models.CharField(max_length=50, choices=SELECTION_STATUS_CHOICES, default='PENDING')
     
     created_at = models.DateTimeField(auto_now_add=True)
 
