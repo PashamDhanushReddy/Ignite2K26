@@ -200,25 +200,17 @@
         <section
             class="max-w-7xl mx-auto px-4 md:px-8 pt-4 sm:pt-6 md:pt-10 pb-12 md:pb-20 relative overflow-hidden lg:overflow-visible">
 
-            <!-- Mobile Background Layer (Ambient illustration behind hero text on mobile, hidden on desktop) -->
+            <!-- Mobile Background Layer (Static ambient background image behind hero text on mobile, hidden on desktop) -->
             <div
                 class="absolute inset-0 -z-10 pointer-events-none lg:hidden flex items-center justify-center overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/60 z-10">
                 </div>
 
-                <!-- Transparent RGBA Graphic for iOS/Apple devices (zero black box, 100% transparent) -->
+                <!-- Static Background Image for Mobile: Always hero_poster.png -->
                 <img id="mobileHeroBgImg" src="{% static 'web/images/hero_poster.png' %}"
                     alt="Ignite 2K27 Expo Background"
                     class="w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md"
                     aria-hidden="true">
-
-                <!-- Transparent WebM Video for Chromium/Firefox browsers -->
-                <video id="mobileHeroBgVid" autoplay loop muted playsinline webkit-playsinline disablepictureinpicture
-                    poster="{% static 'web/images/hero_poster.png' %}"
-                    class="hidden w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md"
-                    aria-hidden="true">
-                    <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
-                </video>
             </div>
 
             <div
@@ -396,6 +388,9 @@
                                 class="hidden w-full h-auto max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-transform duration-500 hover:scale-[1.12]"
                                 aria-label="Ignite 2K27 Student Innovation and Robotics Showcase">
                                 <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
+                                <img src="{% static 'web/images/hero_poster.png' %}"
+                                    alt="Ignite 2K27 Student Innovation and Robotics Showcase"
+                                    class="w-full h-auto object-contain">
                             </video>
                         </div>
 
@@ -1147,19 +1142,6 @@
                 }
             }
 
-            const mobileBgVid = document.getElementById('mobileHeroBgVid');
-            const mobileBgImg = document.getElementById('mobileHeroBgImg');
-            if (!isAppleDevice && mobileBgVid && mobileBgImg) {
-                mobileBgVid.classList.remove('hidden');
-                mobileBgImg.classList.add('hidden');
-                const playPromise = mobileBgVid.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        mobileBgVid.classList.add('hidden');
-                        mobileBgImg.classList.remove('hidden');
-                    });
-                }
-            }
         });
     </script>
 
