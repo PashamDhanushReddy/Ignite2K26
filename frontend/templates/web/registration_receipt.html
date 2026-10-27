@@ -220,20 +220,13 @@
 
             <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 12px 16px; border-radius: 4px; font-size: 12px; color: #475569; line-height: 1.5; margin-top: 20px;">
                 <strong>Next Steps:</strong> Please keep your working model / prototype and presentation slides ready for the grand offline expo on <strong>February 26, 2027</strong>.
+                <p style="margin: 6px 0 0; color: #059669; font-weight: 600;">📩 The official WhatsApp group link & updates have been sent to your registered email.</p>
             </div>
 
             <div class="actions">
                 <button onclick="downloadReceiptPDF()" class="btn" style="background-color: #4f46e5;">
                     📥 Download PDF Receipt
                 </button>
-                <button onclick="window.print()" class="btn btn-secondary">
-                    🖨️ Print Receipt
-                </button>
-                {% if whatsapp_link %}
-                <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
-                    📱 Join WhatsApp Group
-                </a>
-                {% endif %}
                 <a href="/" class="btn btn-secondary">
                     Back to Home
                 </a>
@@ -245,9 +238,10 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        function downloadReceiptPDF() {
+        async function downloadReceiptPDF() {
             const btn = document.querySelector('button[onclick="downloadReceiptPDF()"]');
             const originalText = btn ? btn.innerHTML : '';
             if (btn) btn.innerHTML = '⏳ Generating PDF...';
@@ -256,23 +250,53 @@
             const actions = document.querySelector('.actions');
             if (actions) actions.style.display = 'none';
 
-            const opt = {
-                margin:       [8, 8, 8, 8],
-                filename:     'Ignite_2K27_Registration_Receipt.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                if (actions) actions.style.display = 'flex';
-                if (btn) btn.innerHTML = originalText;
-            }).catch(err => {
+                const jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+                if (jsPDFClass) {
+                    const pdf = new jsPDFClass('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    const margin = 8;
+                    const maxWidth = pdfWidth - (margin * 2);
+                    const maxHeight = pdfHeight - (margin * 2);
+                    
+                    let imgWidth = maxWidth;
+                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    if (imgHeight > maxHeight) {
+                        imgHeight = maxHeight;
+                        imgWidth = (canvas.width * imgHeight) / canvas.height;
+                    }
+                    
+                    const xPos = (pdfWidth - imgWidth) / 2;
+                    const yPos = margin + Math.max(0, (maxHeight - imgHeight) / 4);
+                    
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                    pdf.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+                    pdf.save('Ignite_2K27_Registration_Receipt.pdf');
+                } else {
+                    const opt = {
+                        margin:       [8, 8, 8, 8],
+                        filename:     'Ignite_2K27_Registration_Receipt.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+                    await html2pdf().set(opt).from(element).save();
+                }
+            } catch (err) {
                 console.error("PDF download error:", err);
+            } finally {
                 if (actions) actions.style.display = 'flex';
                 if (btn) btn.innerHTML = originalText;
-                window.print();
-            });
+            }
         }
     </script>
 </body>

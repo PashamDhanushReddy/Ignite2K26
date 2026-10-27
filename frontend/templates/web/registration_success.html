@@ -52,61 +52,52 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 sm:p-8">
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
 
-    <div class="w-full max-w-2xl mx-auto flex flex-col gap-4">
+    <div class="w-full max-w-2xl mx-auto flex flex-col gap-3">
         <div id="receipt-content" class="success-card border border-slate-200 rounded-xl overflow-hidden relative bg-white">
 
-            <div class="px-8 pt-8 pb-4 flex items-center gap-6">
-                <img src="{% static 'web/images/nrcm_logo.png' %}" alt="NRCM Logo" class="w-24 h-24 object-contain">
-                <div class="flex-1 border-l-2 border-slate-200 pl-6">
-                    <h2 class="text-2xl font-bold leading-tight uppercase tracking-wide" style="color: #4a196e;">NARSIMHA REDDY<br>ENGINEERING COLLEGE</h2>
-                    <p class="text-xs text-slate-600 mt-2 font-medium">An Autonomous Institution | Affiliated to JNTUH | Approved by AICTE</p>
-                    <p class="text-xs text-slate-600 mt-1 font-medium">Accredited by NBA & NAAC with 'A' Grade</p>
+            <div class="px-6 py-4 flex items-center gap-4 sm:gap-5">
+                <img src="{% static 'web/images/nrcm_logo.png' %}" alt="NRCM Logo" class="w-16 h-16 sm:w-20 sm:h-20 object-contain">
+                <div class="flex-1 border-l-2 border-slate-200 pl-4 sm:pl-5">
+                    <h2 class="text-lg sm:text-xl font-bold leading-tight uppercase tracking-wide" style="color: #4a196e;">NARSIMHA REDDY<br>ENGINEERING COLLEGE</h2>
+                    <p class="text-[11px] text-slate-600 mt-1 font-medium">An Autonomous Institution | Affiliated to JNTUH | Approved by AICTE</p>
+                    <p class="text-[10px] text-slate-500 font-medium">Accredited by NBA & NAAC with 'A' Grade</p>
                 </div>
             </div>
 
             <div class="gradient-line"></div>
 
-            <div class="p-8 sm:p-12 flex flex-col items-center text-center relative">
+            <div class="p-6 sm:p-8 flex flex-col items-center text-center relative">
 
-                <div class="absolute inset-0 pointer-events-none overflow-hidden">
-                    <div class="absolute top-12 left-1/4 w-2 h-2 bg-yellow-400 rounded-full opacity-70"></div>
-                    <div class="absolute top-8 left-1/3 text-purple-400 text-lg font-bold opacity-70">+</div>
-                    <div class="absolute top-20 right-1/4 text-yellow-400 text-xl font-bold opacity-70">+</div>
-                    <div class="absolute top-10 right-1/3 text-teal-400 text-xl font-bold opacity-70">+</div>
-                    <div class="absolute top-24 left-1/3 text-blue-500 text-xl font-bold opacity-70">+</div>
-                    <div class="absolute top-28 right-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-70"></div>
+                <div class="w-16 h-16 bg-green-50 rounded-full border border-green-100 flex items-center justify-center mb-3 relative z-10 shadow-sm">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' fill='none' stroke='%2310b981' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3.5' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" class="w-8 h-8" alt="Success" />
                 </div>
 
-                <div class="w-24 h-24 bg-green-50 rounded-full border border-green-100 flex items-center justify-center mb-6 relative z-10 shadow-sm">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52' fill='none' stroke='%2310b981' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3.5' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" class="w-12 h-12" alt="Success" />
-                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-dark-blue mb-2">Registration Successful!</h1>
 
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-dark-blue mb-4">Registration Successful!</h1>
-
-                <div class="flex items-center justify-center gap-2 mb-6">
+                <div class="flex items-center justify-center gap-2 mb-3">
                     <div class="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
                     <div class="small-gradient-line"></div>
                 </div>
 
-                <p class="text-slate-600 text-base sm:text-lg mb-6 max-w-lg leading-relaxed">
+                <p class="text-slate-600 text-xs sm:text-sm mb-4 max-w-lg leading-relaxed">
                     Your team <strong class="text-indigo-700">{{ team_name }}</strong> has been successfully registered for <span class="text-indigo-700 font-bold">Ignite 2K27</span>. Get ready for the National Level Project Expo on <span class="font-bold text-slate-900">February 26, 2027</span>!
                 </p>
 
-                <div class="bg-light-green border border-green-200 rounded-xl w-full py-3.5 px-6 flex items-center justify-center gap-3 mb-6">
-                    <div class="w-7 h-7 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23ffffff' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" class="w-4 h-4" alt="Check" />
+                <div class="bg-light-green border border-green-200 rounded-lg w-full py-2.5 px-4 flex items-center justify-center gap-2.5 mb-4">
+                    <div class="w-5 h-5 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23ffffff' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" class="w-3 h-3" alt="Check" />
                     </div>
-                    <span class="text-dark-green font-bold text-base sm:text-lg">Team registration confirmed</span>
+                    <span class="text-dark-green font-bold text-xs sm:text-sm">Team registration confirmed</span>
                 </div>
 
-                <div class="w-full bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6 text-left">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Team & Project Details</span>
-                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 uppercase tracking-wide">Ignite 2K27 Expo</span>
+                <div class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3.5 sm:p-4 mb-3.5 text-left">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200 mb-2.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Team & Project Details</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 uppercase tracking-wide">Ignite 2K27 Expo</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
                             <span class="text-slate-500 font-medium block">Project / Team Title:</span>
                             <span class="font-bold text-slate-900">{{ team_name }}</span>
@@ -144,33 +135,29 @@
                     </div>
                 </div>
 
-                <div class="bg-light-purple border border-purple-100 rounded-xl w-full p-5 flex items-start sm:items-center gap-4 text-left">
-                    <div class="w-11 h-11 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' stroke='%237e22ce' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'/%3E%3C/svg%3E" class="w-5 h-5" alt="Notification" />
+                <div class="bg-light-purple border border-purple-100 rounded-lg w-full p-3.5 flex items-start sm:items-center gap-3 text-left">
+                    <div class="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%237e22ce' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'/%3E%3C/svg%3E" class="w-4 h-4" alt="Notification" />
                     </div>
                     <div>
-                        <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                        <p class="text-slate-700 text-xs leading-relaxed">
                             <strong class="text-dark-purple font-bold">Next Steps:</strong> Keep your project presentation and working model/prototype ready for the offline expo on <strong>February 26, 2027</strong>.
                         </p>
-                        {% if whatsapp_link %}
-                        <p class="mt-2 text-xs sm:text-sm">
-                            <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-bold text-emerald-700 hover:text-emerald-800 transition-colors">
-                                <span>📱 Join Official WhatsApp Group for Expo Updates &rarr;</span>
-                            </a>
+                        <p class="text-emerald-700 text-xs mt-1 font-semibold">
+                            📩 The official WhatsApp group link & expo details have been sent to your registered email.
                         </p>
-                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <div class="px-8 pb-8">
-                <div class="border-t border-slate-200 pt-5 flex items-center gap-4">
-                    <div class="w-9 h-9 bg-purple-50 rounded-full flex items-center justify-center flex-shrink-0">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%239333ea' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'/%3E%3C/svg%3E" class="w-4 h-4" alt="Mail" />
+            <div class="px-6 pb-4 pt-1">
+                <div class="border-t border-slate-200 pt-3 flex items-center gap-3">
+                    <div class="w-7 h-7 bg-purple-50 rounded-full flex items-center justify-center flex-shrink-0">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%239333ea' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'/%3E%3C/svg%3E" class="w-3.5 h-3.5" alt="Mail" />
                     </div>
                     <div>
-                        <p class="text-xs sm:text-sm text-slate-700 font-semibold">This is an auto-generated confirmation receipt.</p>
-                        <p class="text-xs text-slate-500">For queries, contact the Ignite 2K27 organizing committee at NRCM.</p>
+                        <p class="text-xs text-slate-700 font-semibold">This is an auto-generated confirmation receipt.</p>
+                        <p class="text-[11px] text-slate-500">For queries, contact the Ignite 2K27 organizing committee at NRCM.</p>
                     </div>
                 </div>
             </div>
@@ -186,52 +173,83 @@
                 </svg>
                 <span>Download PDF Receipt</span>
             </button>
-            <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-5 rounded-xl transition-all duration-300 shadow-sm text-center text-sm cursor-pointer">
-                🖨️ Print
-            </button>
             <a href="/register/" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-xl transition-all duration-300 shadow-sm text-center text-sm">
                 Register Another Team
             </a>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        function generatePDF() {
+        async function generatePDF() {
             const btn = document.querySelector('button[onclick="generatePDF()"]');
             const originalBtnHtml = btn ? btn.innerHTML : '';
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<span>⏳ Downloading PDF...</span>`;
+                btn.innerHTML = `<span>⏳ Generating Single-Page PDF...</span>`;
             }
 
             const element = document.getElementById('receipt-content');
-            const opt = {
-                margin:       [0.2, 0.2, 0.2, 0.2],
-                filename:     'Ignite_2K27_Registration_Receipt.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
+            
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2,
                     useCORS: true,
                     scrollY: 0,
                     backgroundColor: '#ffffff'
-                },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
+                });
 
-            html2pdf().set(opt).from(element).save().then(() => {
+                const jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+                if (jsPDFClass) {
+                    const pdf = new jsPDFClass('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    
+                    const margin = 8; // 8mm margin
+                    const maxWidth = pdfWidth - (margin * 2);
+                    const maxHeight = pdfHeight - (margin * 2);
+                    
+                    let imgWidth = maxWidth;
+                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    if (imgHeight > maxHeight) {
+                        imgHeight = maxHeight;
+                        imgWidth = (canvas.width * imgHeight) / canvas.height;
+                    }
+                    
+                    const xPos = (pdfWidth - imgWidth) / 2;
+                    const yPos = margin + Math.max(0, (maxHeight - imgHeight) / 4);
+                    
+                    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                    pdf.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+                    pdf.save('Ignite_2K27_Registration_Receipt.pdf');
+                } else {
+                    const opt = {
+                        margin:       [0.2, 0.2, 0.2, 0.2],
+                        filename:     'Ignite_2K27_Registration_Receipt.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff' },
+                        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                    };
+                    await html2pdf().set(opt).from(element).save();
+                }
+            } catch (err) {
+                console.error("PDF generation error, fallback to html2pdf:", err);
+                const opt = {
+                    margin:       [0.2, 0.2, 0.2, 0.2],
+                    filename:     'Ignite_2K27_Registration_Receipt.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true, scrollY: 0, backgroundColor: '#ffffff' },
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+                await html2pdf().set(opt).from(element).save();
+            } finally {
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = originalBtnHtml;
                 }
-            }).catch(err => {
-                console.error("PDF generation failed:", err);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = originalBtnHtml;
-                }
-                window.print();
-            });
+            }
         }
     </script>
 </body>
