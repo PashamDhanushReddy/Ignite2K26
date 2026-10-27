@@ -45,7 +45,7 @@
                     animation: {
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float-slow': 'float 8s ease-in-out infinite',
-                        'scroll': 'scroll 35s linear infinite',
+                        'scroll': 'scroll 75s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -86,6 +86,9 @@
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
                 border: 1px solid rgba(255, 255, 255, 0.9);
+            }
+            .hover\:pause:hover {
+                animation-play-state: paused;
             }
         }
     </style>
