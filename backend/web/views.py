@@ -1,10 +1,15 @@
+import os
+import threading
+import urllib.request
+import urllib.error
+import json
+from email.utils import parseaddr
 from django.shortcuts import render, redirect
 from .models import Registration, TeamMember
 from django.contrib import messages
 from django.db import transaction, IntegrityError
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
-import threading
 
 def index(request):
     domains = [
