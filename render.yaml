@@ -1,0 +1,24 @@
+databases:
+  - name: ignite_db
+    databaseName: ignite_admin
+    user: ignite_user
+
+services:
+  - type: web
+    name: ignite-admin
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn ignite_admin.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ignite_db
+          property: connectionString

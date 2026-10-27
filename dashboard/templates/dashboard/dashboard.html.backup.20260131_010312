@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeStorm Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            padding-top: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Cards */
+        .card,
+        .stats-card,
+        .filter-section,
+        .export-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: var(--glass-border);
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Enhanced table container with glassmorphism borders */
+        .table-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: var(--glass-border);
+            box-shadow:
+                var(--card-shadow),
+                0 0 0 1px rgba(102, 126, 234, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .table-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Enhanced table scrolling for mobile */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive {
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            min-width: 100%;
+        }
+
+        /* Sticky table headers for better navigation */
+        table.dataTable thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 10;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3) !important;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        table.dataTable thead th:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a42a0) !important;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Dynamic column visibility - progressive enhancement */
+        /* REMOVED: All columns should be visible as per user request */
+
+        /* Force horizontal scrolling on mobile */
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-responsive {
+                min-width: 100%;
+                overflow-x: auto !important;
+            }
+
+            table.dataTable {
+                min-width: 1000px !important;
+                width: auto !important;
+            }
+        }
+
+        .table-responsive {
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+
+        .navbar {
+            background: var(--primary-gradient) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1030;
+            /* Ensure navbar stays above other elements */
+            position: sticky;
+            top: 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 8px 16px !important;
+            margin: 0 5px;
+            position: relative;
+            z-index: 1;
+            /* Ensure links are clickable */
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fix for navbar button click issues */
+        .navbar-nav .nav-item {
+            position: relative;
+            z-index: 1;
+        }
+
+        .navbar-toggler {
+            z-index: 1031;
+            /* Ensure toggler is above collapsed menu */
+            position: relative;
+        }
+
+        .navbar-collapse {
+            z-index: 1030;
+            /* Ensure collapsed menu is above content */
+        }
+
+        /* Ensure navbar is fully interactive */
+        .navbar {
+            pointer-events: auto !important;
+        }
+
+        .navbar * {
+            pointer-events: auto !important;
+        }
+
+        /* Prevent any overlays from blocking navbar clicks */
+        .navbar::before {
+            display: none !important;
+        }
+
+        .stats-card {
+            border: none;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            z-index: -1;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Custom Gradients for Stats Cards */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%) !important;
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important;
+        }
+
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%) !important;
+        }
+
+        .btn-custom {
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .table thead th {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 15px;
+        }
+
+        /* Enhanced table borders for better visual definition */
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(102, 126, 234, 0.15),
+                0 0 0 1px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .table thead {
+            border-radius: 15px 15px 0 0;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: var(--primary-gradient);
+            color: white;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.4);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .table thead th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .table thead th:last-child {
+            border-top-right-radius: 15px;
+            border-right: none;
+        }
+
+        .table tbody td {
+            border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+            border-right: 1px solid rgba(102, 126, 234, 0.08);
+            padding: 12px 15px;
+            vertical-align: middle;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        .table tbody td:last-child {
+            border-right: none;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tbody tr:not(:last-child) td {
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        /* Enhanced hover effect with border highlight */
+        .table tbody tr:hover td {
+            border-bottom: 1px solid rgba(102, 126, 234, 0.4);
+            border-right: 1px solid rgba(102, 126, 234, 0.25);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .table tbody tr:hover td:last-child {
+            border-right: none;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.08);
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+            transform: scale(1.01);
+        }
+
+        .team-member-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            margin: 1px;
+        }
+
+        .team-members-cell {
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .team-members-cell:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-members-cell:active {
+            transform: scale(0.98);
+        }
+
+        .idea-title {
+            font-weight: 500;
+            color: #495057;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-badge {
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-ppt {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-no-ppt {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Enhanced button styling for mobile visibility */
+        .btn-youtube {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            border: none;
+            border-radius: 15px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-youtube:hover {
+            background: linear-gradient(135deg, #cc0000, #aa0000);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+        }
+
+        /* Sortable header styling */
+        table.dataTable thead th.sortable {
+            cursor: pointer;
+            position: relative;
+            padding-right: 20px !important;
+        }
+
+        table.dataTable thead th.sortable::after {
+            content: '\f0dc';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        table.dataTable thead th.sorting_asc::after {
+            content: '\f0de';
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        table.dataTable thead th.sorting_desc::after {
+            content: '\f0dd';
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        table.dataTable thead th.sortable:hover::after {
+            opacity: 1;
+            color: #ffffff;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            border: none;
+            border-radius: 15px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #45a049, #4caf50);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .filter-badge {
+            background: #f0f0f0;
+            color: #666;
+            border-radius: 15px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        .date-input {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .date-input:focus {
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding-top: 0.5rem;
+            }
+
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+
+            .filter-section .row>div {
+                margin-bottom: 1rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .btn-custom {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .d-flex.gap-2 {
+                flex-direction: column;
+            }
+
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 0.5rem 1rem;
+            }
+
+            /* Ensure mobile menu is fully clickable */
+            .navbar-collapse {
+                position: relative;
+                z-index: 1030;
+                background: transparent;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 1rem !important;
+            }
+
+            .stats-card .card-body h2 {
+                font-size: 1.5rem;
+            }
+
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+
+            .filter-section .card-body {
+                padding: 1rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+            }
+
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            /* Ensure Transaction ID and Payment Proof columns remain visible on very small screens */
+            .table-responsive th:nth-child(10),
+            /* Transaction ID column */
+            .table-responsive th:nth-child(11),
+            /* Payment Proof column */
+            .table-responsive td:nth-child(10) {
+                display: table-cell !important;
+                visibility: visible !important;
+            }
+
+            /* Adjust button sizes for mobile */
+            .table-responsive .btn-youtube,
+            .table-responsive .btn-download {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* Mobile-specific table improvements */
+        @media (max-width: 768px) {
+            .table-responsive table {
+                font-size: 0.875rem;
+            }
+
+            .table-responsive th,
+            .table-responsive td {
+                padding: 0.5rem 0.25rem;
+                white-space: nowrap;
+            }
+
+            .table-responsive .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .table-responsive .btn-sm {
+                width: 100%;
+                font-size: 0.75rem;
+            }
+
+            /* Ensure Payment Proof column remains visible */
+            .table-responsive th:nth-child(10),
+            /* Transaction ID column */
+            .table-responsive th:nth-child(11),
+            /* Payment Proof column */
+            .table-responsive td:nth-child(10),
+            .table-responsive td:nth-child(11) {
+                display: table-cell !important;
+                visibility: visible !important;
+            }
+
+            /* Adjust button sizes for mobile */
+            .table-responsive .btn-youtube,
+            .table-responsive .btn-download {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+
+
+        /* Improved mobile table display */
+        .mobile-table-header {
+            display: none;
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 576px) {
+            .mobile-table-header {
+                display: block;
+            }
+
+            .table-responsive td {
+                display: block;
+                width: 100%;
+                padding: 0.5rem;
+                border: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .table-responsive td:last-child {
+                border-bottom: none;
+            }
+
+            .table-responsive tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                background: white;
+            }
+
+            .table-responsive thead {
+                display: none;
+            }
+
+            /* Mobile button improvements */
+            .table-responsive .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .table-responsive .btn-sm {
+                width: 100%;
+                font-size: 0.8rem;
+                padding: 0.5rem;
+            }
+        }
+
+        /* Tablet improvements */
+        @media (max-width: 768px) and (min-width: 577px) {
+            .table-responsive .btn-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+
+            .table-responsive .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                flex: 1;
+                min-width: 80px;
+            }
+        }
+
+        .export-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Override DataTables responsive hiding for YouTube and PPT Link columns */
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child,
+        table.dataTable.dtr-inline.collapsed>tbody>tr>th.child,
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.dataTables_empty {
+            cursor: default !important;
+        }
+
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child:before,
+        table.dataTable.dtr-inline.collapsed>tbody>tr>th.child:before {
+            display: none !important;
+        }
+
+        /* Force Theme, Transaction ID and Payment Proof columns to always be visible */
+        table.dataTable>tbody>tr>td:nth-child(9),
+        table.dataTable>tbody>tr>th:nth-child(9),
+        table.dataTable>tbody>tr>td:nth-child(10),
+        table.dataTable>tbody>tr>th:nth-child(10),
+        table.dataTable>tbody>tr>td:nth-child(11),
+        table.dataTable>tbody>tr>th:nth-child(11) {
+            display: table-cell !important;
+        }
+
+        /* Ensure table headers remain visible */
+        table.dataTable>thead>tr>th:nth-child(9),
+        table.dataTable>thead>tr>th:nth-child(10),
+        table.dataTable>thead>tr>th:nth-child(11) {
+            display: table-cell !important;
+            visibility: visible !important;
+            min-width: 100px !important;
+            width: auto !important;
+        }
+
+        /* Ensure responsive control column doesn't hide our important columns */
+        table.dataTable>tbody>tr>td.control,
+        table.dataTable>tbody>tr>th.control {
+            display: none !important;
+        }
+
+        /* Override DataTables Responsive plugin completely for specific columns */
+        table.dataTable>thead>tr>th:nth-child(9),
+        table.dataTable>tbody>tr>td:nth-child(9),
+        table.dataTable>thead>tr>th:nth-child(10),
+        table.dataTable>tbody>tr>td:nth-child(10),
+        table.dataTable>thead>tr>th:nth-child(11),
+        table.dataTable>tbody>tr>td:nth-child(11) {
+            display: table-cell !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: auto !important;
+            min-width: 80px !important;
+        }
+
+        /* Prevent DataTables from collapsing these columns */
+        @media screen and (max-width: 768px) {
+            table.dataTable>tbody>tr>td:nth-child(10) {
+                display: table-cell !important;
+                visibility: visible !important;
+                position: relative !important;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
+            }
+        }
+
+        table.dataTable tbody tr.row-selected,
+        table.dataTable tbody tr.row-selected>td {
+            background-color: rgba(46, 204, 113, 0.25) !important;
+            border-color: rgba(46, 204, 113, 0.4) !important;
+        }
+
+        table.dataTable tbody tr.row-waitlisted,
+        table.dataTable tbody tr.row-waitlisted>td {
+            background-color: rgba(241, 196, 15, 0.25) !important;
+            border-color: rgba(241, 196, 15, 0.4) !important;
+        }
+
+        table.dataTable tbody tr.row-rejected,
+        table.dataTable tbody tr.row-rejected>td {
+            background-color: rgba(231, 76, 60, 0.25) !important;
+            border-color: rgba(231, 76, 60, 0.4) !important;
+        }
+
+        table.dataTable tbody tr.row-pending,
+        table.dataTable tbody tr.row-pending>td {
+            background-color: rgba(149, 165, 166, 0.25) !important;
+            border-color: rgba(149, 165, 166, 0.4) !important;
+        }
+
+        /* Hover Effects with Enhanced Borders */
+        table.dataTable tbody tr.row-selected:hover,
+        table.dataTable tbody tr.row-selected:hover>td {
+            background-color: rgba(46, 204, 113, 0.35) !important;
+            border-color: rgba(46, 204, 113, 0.6) !important;
+        }
+
+        table.dataTable tbody tr.row-waitlisted:hover,
+        table.dataTable tbody tr.row-waitlisted:hover>td {
+            background-color: rgba(241, 196, 15, 0.35) !important;
+            border-color: rgba(241, 196, 15, 0.6) !important;
+        }
+
+        table.dataTable tbody tr.row-rejected:hover,
+        table.dataTable tbody tr.row-rejected:hover>td {
+            background-color: rgba(231, 76, 60, 0.35) !important;
+            border-color: rgba(231, 76, 60, 0.6) !important;
+        }
+
+        table.dataTable tbody tr.row-pending:hover,
+        table.dataTable tbody tr.row-pending:hover>td {
+            background-color: rgba(149, 165, 166, 0.35) !important;
+            border-color: rgba(149, 165, 166, 0.6) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sticky Top Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand animate__animated animate__fadeInLeft" href="{% url 'dashboard' %}">
+                <i class="fas fa-code me-2"></i>CodeStorm Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto animate__animated animate__fadeInRight">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                            href="{% url 'export_registrations' %}?{{ request.GET.urlencode }}&format=excel">
+                            <i class="fas fa-file-excel me-1"></i> Export Excel
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                            href="{% url 'export_registrations' %}?{{ request.GET.urlencode }}&format=csv">
+                            <i class="fas fa-file-csv me-1"></i> Export CSV
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-success btn-sm ms-2" onclick="saveSelectionChanges()" id="saveChangesBtn"
+                            style="display: none;">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid main-content p-4">
+        <!-- Header Stats & Charts -->
+        <div class="row mb-4">
+            <!-- Stats Cards -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card stats-card bg-gradient-primary text-white h-100 animate__animated animate__fadeInUp"
+                            style="animation-delay: 0.1s;">
+                            <div class="card-body text-center d-flex flex-column justify-content-center">
+                                <i class="fas fa-users fa-2x mb-3 opacity-75"></i>
+                                <h2 class="mb-1 fw-bold">{{ total_registrations }}</h2>
+                                <small class="text-uppercase tracking-wider opacity-75">Total Registrations</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <div class="card stats-card bg-gradient-info text-white h-100 animate__animated animate__fadeInUp"
+                            style="animation-delay: 0.2s;">
+                            <div class="card-body text-center d-flex flex-column justify-content-center">
+                                <i class="fas fa-filter fa-2x mb-3 opacity-75"></i>
+                                <h2 class="mb-1 fw-bold">{{ registrations|length }}</h2>
+                                <small class="text-uppercase tracking-wider opacity-75">Filtered Results</small>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Filter Section -->
+                <div class="card filter-section mb-4 animate__animated animate__fadeInUp"
+                    style="animation-delay: 0.4s;">
+
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="fas fa-filter me-2"></i>Advanced Filters
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" id="filterForm">
+                            <div class="row">
+
+                                <div class="col-lg-2 col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Team Size</label>
+                                    <select name="team_size" class="form-select">
+                                        <option value="">All Sizes</option>
+                                        {% for size in team_sizes %}
+                                        <option value="{{ size }}" {% if filters.team_size==size|stringformat:"s"
+                                            %}selected{% endif %}>
+                                            {{ size }} Members
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Theme</label>
+                                    <select name="idea_theme" class="form-select">
+                                        <option value="">All Themes</option>
+                                        {% for theme in idea_themes %}
+                                        <option value="{{ theme }}" {% if filters.idea_theme==theme %}selected{% endif
+                                            %}>
+                                            {{ theme }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Payment Status</label>
+                                    <select name="selection_status" class="form-select">
+                                        <option value="">All Statuses</option>
+                                        <option value="pending" {% if filters.selection_status=='pending' %}selected{%
+                                            endif %}>Pending</option>
+                                        <option value="selected" {% if filters.selection_status=='selected' %}selected{%
+                                            endif %}>Selected</option>
+                                        <option value="rejected" {% if filters.selection_status=='rejected' %}selected{%
+                                            endif %}>Rejected</option>
+                                        <option value="waitlisted" {% if filters.selection_status=='waitlisted'
+                                            %}selected{% endif %}>Waitlisted</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-2 col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Registration Date</label>
+                                    <input type="date" name="date" class="form-control date-input"
+                                        value="{{ filters.date }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button type="submit" class="btn btn-primary btn-custom">
+                                            <i class="fas fa-search me-1"></i>Apply Filters
+                                        </button>
+                                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-custom">
+                                            <i class="fas fa-refresh me-1"></i>Reset
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Active Filters Display -->
+                {% if filters.team_size or filters.has_ppt or filters.date or filters.selection_status %}
+                <div class="mb-3">
+                    <small class="text-muted">Active Filters:</small>
+
+                    {% if filters.team_size %}<span class="filter-badge">Size: {{ filters.team_size }}</span>{% endif %}
+                    {% if filters.has_ppt %}<span class="filter-badge">PPT: {{ filters.has_ppt }}</span>{% endif %}
+                    {% if filters.date %}<span class="filter-badge">Date: {{ filters.date }}</span>{% endif %}
+                    {% if filters.selection_status %}<span class="filter-badge">Status: {{
+                        filters.selection_status|title }}</span>{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Summary Table -->
+                <div class="card mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Member Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th colspan="6" class="text-center">T-Shirt Sizes</th>
+                                        <th colspan="2" class="text-center">Food Preferences</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">S</th>
+                                        <th class="text-center">M</th>
+                                        <th class="text-center">L</th>
+                                        <th class="text-center">XL</th>
+                                        <th class="text-center">XXL</th>
+                                        <th class="text-center">XXXL</th>
+                                        <th class="text-center">Veg</th>
+                                        <th class="text-center">NonVeg</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center fw-bold">{{ tshirt_counts.S }}</td>
+                                        <td class="text-center fw-bold">{{ tshirt_counts.M }}</td>
+                                        <td class="text-center fw-bold">{{ tshirt_counts.L }}</td>
+                                        <td class="text-center fw-bold">{{ tshirt_counts.XL }}</td>
+                                        <td class="text-center fw-bold">{{ tshirt_counts.XXL }}</td>
+                                        <td class="text-center fw-bold">{{ tshirt_counts.XXXL }}</td>
+                                        <td class="text-center fw-bold">{{ food_counts.veg }}</td>
+                                        <td class="text-center fw-bold">{{ food_counts.nonveg }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- End col-lg-8 -->
+
+            <!-- Chart Column -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 animate__animated animate__fadeInRight" style="animation-delay: 0.5s;">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-chart-pie me-2 text-primary"></i>Status Overview
+                        </h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <div style="width: 100%; height: 300px; position: relative;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End row -->
+
+
+
+        <!-- Registrations Table -->
+        <div class="table-container animate__animated animate__fadeInUp" style="animation-delay: 0.7s;">
+            <div class="table-responsive">
+                <table id="registrationsTable" class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Team Name</th>
+                            <th>Team Leader</th>
+                            <th>College</th>
+
+                            <th>Team Size</th>
+                            <th>Payment Status</th>
+                            <th>Team Members</th>
+                            <th>Registration Date</th>
+                            <th>Theme</th>
+                            <th>Transaction ID</th>
+                            <th>Abstract</th>
+                            <th>Payment Proof</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reg in registrations %}
+                        <tr
+                            class="{% if reg.selection_status == 'selected' %}row-selected{% elif reg.selection_status == 'waitlisted' %}row-waitlisted{% elif reg.selection_status == 'rejected' %}row-rejected{% else %}row-pending{% endif %}">
+                            <td>
+                                <div class="mobile-table-header">Team Name</div>
+                                <div class="fw-semibold text-primary">{{ reg.team_name }}</div>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Team Leader</div>
+                                <div class="fw-medium">{{ reg.team_leader_name }}</div>
+                                <small class="text-muted d-block">{{ reg.team_leader_email }}</small>
+                                <small class="text-muted">{{ reg.team_leader_phone }}</small>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">College</div>
+                                <span class="badge bg-secondary">{{ reg.college_name }}</span>
+                            </td>
+
+                            <td>
+                                <div class="mobile-table-header">Team Size</div>
+                                <span class="badge bg-info">{{ reg.team_size }} Members</span>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Payment Status</div>
+                                <select class="form-select form-select-sm selection-status"
+                                    data-registration-id="{{ reg.id }}"
+                                    data-current-status="{{ reg.selection_status|default:'pending' }}">
+                                    <option value="pending" {% if reg.selection_status=='pending' %}selected{% endif %}>
+                                        Pending</option>
+                                    <option value="selected" {% if reg.selection_status=='selected' %}selected{% endif
+                                        %}>Selected</option>
+                                    <option value="rejected" {% if reg.selection_status=='rejected' %}selected{% endif
+                                        %}>Rejected</option>
+                                    <option value="waitlisted" {% if reg.selection_status=='waitlisted' %}selected{%
+                                        endif %}>Waitlisted</option>
+                                </select>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Team Members</div>
+                                <div class="team-members-cell" data-team-name="{{ reg.team_name }}"
+                                    data-team-members='{{ reg.team_members_json }}' style="cursor: pointer;"
+                                    title="Click to view team member details">
+                                    {% if reg.team_members %}
+                                    {% for member in reg.team_members %}
+                                    <span class="team-member-badge">{{ member.name }}</span>
+                                    {% endfor %}
+                                    {% else %}
+                                    <small class="text-muted">No additional members</small>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Registration Date</div>
+                                <small class="text-muted">{{ reg.registration_date|date:"M d, Y" }}</small>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Theme</div>
+                                <div title="{{ reg.idea_theme }}">
+                                    {{ reg.idea_theme|default:"N/A" }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Transaction ID</div>
+                                <small class="text-muted">{{ reg.transaction_id|default:"N/A" }}</small>
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Abstract</div>
+                                {% if reg.abstract_url %}
+                                <a href="{{ reg.abstract_url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                    <i class="fas fa-file-alt me-1"></i>View Abstract
+                                </a>
+                                {% else %}
+                                <span class="text-muted">No Abstract</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="mobile-table-header">Payment Proof</div>
+                                {% if reg.payment_proof_url %}
+                                <button class="btn btn-sm btn-primary view-proof-btn"
+                                    data-url="{{ reg.payment_proof_url }}" data-team="{{ reg.team_name }}">
+                                    <i class="fas fa-eye me-1"></i>View Proof
+                                </button>
+                                {% else %}
+                                <span class="text-muted">No Proof</span>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No registrations found</h5>
+                                <p class="text-muted">Try adjusting your filters or check back later.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+    </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+
+        $(document).ready(function () {
+            // Suppress DataTables warnings globally
+            $.fn.dataTable.ext.errMode = 'none';
+
+            // Handle DataTables errors silently
+            $('#registrationsTable').on('error.dt', function (e, settings, techNote, message) {
+                console.log('DataTables error suppressed:', message);
+                e.preventDefault();
+            });
+
+            // Global functions
+            window.updateHeaderVisibility = function () {
+                const width = $(window).width();
+                const table = $('#registrationsTable').DataTable();
+
+                // Reset all columns to visible first
+                table.columns().visible(true);
+
+                // Hide columns progressively based on screen width
+                // DISABLED: Showing all columns with horizontal scroll as requested
+                /*
+                if (width < 576) {
+                    // Very small screens - hide college code and theme
+                    table.column(4).visible(false); // College Code
+                    table.column(8).visible(false); // Theme
+                }
+                if (width < 768) {
+                    // Small screens - hide registration date
+                    table.column(7).visible(false); // Registration Date
+                }
+                if (width < 992) {
+                    // Medium screens - hide team members
+                    table.column(6).visible(false); // Team Members
+                }
+                if (width < 1200) {
+                    // Large screens - hide theme if not already hidden
+                    if (width >= 576) {
+                        table.column(8).visible(false); // Theme
+                    }
+                }
+                */
+
+                // Always keep essential columns visible
+                table.column(0).visible(true); // Team Name
+                table.column(1).visible(true); // Team Leader
+                table.column(2).visible(true); // College
+                table.column(5).visible(true); // Payment Status
+                table.column(8).visible(true); // Theme
+                table.column(9).visible(true); // Transaction ID
+                table.column(10).visible(true); // Payment Proof
+
+                // Adjust table width based on visible columns
+                adjustTableWidth();
+            };
+
+            window.adjustTableWidth = function () {
+                const table = $('#registrationsTable').DataTable();
+                const visibleColumns = table.columns().visible().toArray().filter(Boolean).length;
+                const minWidth = Math.max(800, visibleColumns * 120); // Minimum 120px per column
+
+                $('#registrationsTable').css('min-width', minWidth + 'px');
+                table.columns.adjust().draw();
+            };
+
+            // Initialize DataTable with custom options
+            let table;
+            try {
+                table = $('#registrationsTable').DataTable({
+                    responsive: false, // Disable responsive plugin completely
+                    scrollX: true,     // Enable horizontal scrolling instead
+                    autoWidth: false,
+                    pageLength: 25,
+                    order: [[7, 'desc']], // Sort by registration date (column 8, 0-indexed)
+                    searching: false, // Disable search functionality
+                    language: {
+                        lengthMenu: "Show _MENU_ registrations per page",
+                        info: "Showing _START_ to _END_ of _TOTAL_ registrations",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        },
+                        emptyTable: "No registrations found. Try adjusting your filters or check back later."
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: [6, 10] }, // Disable sorting for team members and Payment Proof
+                        { type: 'num', targets: [4] }, // Team size as number
+                        { type: 'date', targets: [7] }, // Registration date
+                        // Ensure all columns remain visible (no responsive hiding)
+                        { className: 'all', targets: '_all' } // Show all columns on all devices
+                    ],
+                    // Suppress error dialogs
+                    initComplete: function (settings, json) {
+                        // Add sorting indicators to headers
+                        const api = this.api();
+                        api.columns().every(function () {
+                            const header = $(this.header());
+                            if (this.orderable()) {
+                                header.addClass('sortable');
+                                header.attr('title', 'Click to sort');
+                            }
+                        });
+
+                        // Add responsive behavior to headers
+                        $(window).resize(function () {
+                            updateHeaderVisibility();
+                        });
+
+                        // Initial header visibility check
+                        updateHeaderVisibility();
+
+                        // Hide any error messages that might appear
+                        $('.dataTables_empty').hide().show(); // Ensure empty message is visible
+                    }
+                });
+            } catch (error) {
+                console.log('DataTables initialization error suppressed:', error);
+                // Create a minimal table structure if DataTables fails
+                table = {
+                    rows: function () { return { filter: function () { return { data: function () { return []; } }; } }; },
+                    on: function () { return this; }
+                };
+            }
+
+            // Team Member Details Modal Functionality
+            $(document).on('click', '.team-members-cell', function () {
+                const teamName = $(this).data('team-name');
+                const teamMembers = $(this).data('team-members');
+
+                // Debug: Log the team members data to console
+                console.log('Team Members Data:', teamMembers);
+
+                let modalContent = '<h6>Team: ' + teamName + '</h6>';
+                modalContent += '<div class="table-responsive">';
+                modalContent += '<table class="table table-sm table-bordered table-striped">';
+                modalContent += '<thead class="table-light"><tr>' +
+                    '<th>Name</th>' +
+                    '<th>Roll No</th>' +
+                    '<th>Course</th>' +
+                    '<th>College</th>' +
+                    '<th>T-Shirt</th>' +
+                    '<th>Food</th>' +
+                    '<th>Email</th>' +
+                    '<th>Phone</th>' +
+                    '<th>Role</th>' +
+                    '</tr></thead>';
+                modalContent += '<tbody>';
+
+                if (teamMembers && teamMembers.length > 0) {
+                    teamMembers.forEach(function (member) {
+                        console.log('Member data:', member);
+                        modalContent += '<tr>';
+                        modalContent += '<td class="fw-medium">' + (member.name || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.roll || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.course || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.college || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.tshirt_size || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.food_preference || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.email || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.phone || 'N/A') + '</td>';
+                        modalContent += '<td>' + (member.is_leader ? '<span class="badge bg-primary">Leader</span>' : 'Member') + '</td>';
+                        modalContent += '</tr>';
+                    });
+                } else {
+                    modalContent += '<tr><td colspan="9" class="text-center text-muted">No team members found</td></tr>';
+                }
+
+                modalContent += '</tbody></table></div>';
+
+                $('#teamMemberContent').html(modalContent);
+                $('#teamMemberModalLabel').text('Team Members - ' + teamName);
+                $('#teamMemberModal').modal('show');
+            });
+
+            // Payment Proof Modal Functionality
+            $(document).on('click', '.view-proof-btn', function () {
+                const url = $(this).data('url');
+                const teamName = $(this).data('team');
+
+                // Set modal title
+                $('#paymentProofModalLabel').text('Payment Proof - ' + teamName);
+
+                // Set download link
+                $('#downloadProofBtn').attr('href', url);
+
+                // Reset content to loader
+                $('#paymentProofContent').html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>');
+
+                // Show modal
+                $('#paymentProofModal').modal('show');
+
+                // Check if it's an image or PDF
+                // For simplicity, we'll try to load it as an image first
+                const img = new Image();
+                img.onload = function () {
+                    $('#paymentProofContent').html('<img src="' + url + '" class="img-fluid" alt="Payment Proof">');
+                };
+                img.onerror = function () {
+                    // If image load fails, it might be a PDF or other file type
+                    // Or it might be a direct download link that doesn't allow embedding
+                    // We'll show an iframe for PDF or a message
+                    $('#paymentProofContent').html(
+                        '<div class="text-center">' +
+                        '<p class="mb-3">Preview might not be available for this file type.</p>' +
+                        '<a href="' + url + '" target="_blank" class="btn btn-outline-primary">' +
+                        '<i class="fas fa-external-link-alt me-1"></i>Open in New Tab' +
+                        '</a>' +
+                        '</div>'
+                    );
+                };
+                img.src = url;
+            });
+
+            // Auto-submit form on filter change (with debounce)
+            let filterTimeout;
+            $('#filterForm select, #filterForm input').on('change input', function () {
+                clearTimeout(filterTimeout);
+                filterTimeout = setTimeout(function () {
+                    $('#filterForm').submit();
+                }, 500);
+            });
+
+            // Date filter validation
+            $('#filterForm input[name="date"]').on('change', function () {
+                const selectedDate = $(this).val();
+                if (selectedDate) {
+                    console.log('Filtering by date:', selectedDate);
+                }
+            });
+        });
+    </script>
+
+    <!-- Selection Status Update Script -->
+    <script>
+        // Track changes made to selection status
+        let selectionChanges = {};
+
+        // Add event listeners to all selection status dropdowns
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectionDropdowns = document.querySelectorAll('.selection-status');
+
+            selectionDropdowns.forEach(function (dropdown) {
+                dropdown.addEventListener('change', function () {
+                    const registrationId = this.getAttribute('data-registration-id');
+                    const currentStatus = this.getAttribute('data-current-status');
+                    const newStatus = this.value;
+
+                    // Only track if status actually changed
+                    if (currentStatus !== newStatus) {
+                        selectionChanges[registrationId] = newStatus;
+                        this.setAttribute('data-current-status', newStatus);
+
+                        // Show save button
+                        document.getElementById('saveChangesBtn').style.display = 'inline-block';
+
+                        // Add visual indication that this row has changes
+                        this.closest('tr').classList.add('table-warning');
+                    } else {
+                        // Remove from changes if status reverted to original
+                        delete selectionChanges[registrationId];
+                        this.closest('tr').classList.remove('table-warning');
+
+                        // Hide save button if no more changes
+                        if (Object.keys(selectionChanges).length === 0) {
+                            document.getElementById('saveChangesBtn').style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+
+        // Function to save all selection changes
+        function saveSelectionChanges() {
+            if (Object.keys(selectionChanges).length === 0) {
+                return;
+            }
+
+            // Disable save button and show loading state
+            const saveBtn = document.getElementById('saveChangesBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Prepare data for API call
+            const updates = Object.entries(selectionChanges).map(([registrationId, status]) => ({
+                registration_id: registrationId,
+                selection_status: status
+            }));
+
+            // Make API calls for each update
+            Promise.all(updates.map(update =>
+                fetch('{% url "update_selection_status" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(update)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove visual indication for successfully updated rows
+                            const row = document.querySelector(`[data-registration-id="${update.registration_id}"]`).closest('tr');
+                            row.classList.remove('table-warning');
+                            row.classList.add('table-success');
+
+                            // Remove from changes after successful update
+                            setTimeout(() => {
+                                row.classList.remove('table-success');
+                            }, 2000);
+
+                            return { success: true, registration_id: update.registration_id };
+                        } else {
+                            throw new Error(data.error || 'Update failed');
+                        }
+                    })
+            ))
+                .then(results => {
+                    // Clear changes after all successful updates
+                    selectionChanges = {};
+
+                    // Reset save button
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    saveBtn.style.display = 'none';
+
+                    // Show success message
+                    showAlert('Selection status updated successfully!', 'success');
+
+                    // Refresh the page after a short delay to show the success message
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error updating selection status:', error);
+
+                    // Reset save button
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+
+                    // Show error message
+                    showAlert('Error updating selection status. Please try again.', 'danger');
+                });
+        }
+
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Helper function to show alerts
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 1050; min-width: 300px;';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Auto-dismiss after 3 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+    </script>
+    </div> <!-- Close main-content -->
+    <!-- Chart Initialization -->
+    <script>
+        // Fix for navbar button click reliability
+        document.addEventListener('DOMContentLoaded', function () {
+            // Navbar links work fine by default - removed custom handler that was causing double tabs
+
+            // Fix for navbar toggler on mobile
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            if (navbarToggler) {
+                navbarToggler.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Prevent clicks on collapsed navbar from being blocked
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            if (navbarCollapse) {
+                navbarCollapse.addEventListener('click', function (e) {
+                    // Allow clicks to propagate normally within the collapsed menu
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+
+    <!-- Chart Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get data from template
+            const statuses = JSON.parse('{{ statuses_json|escapejs }}');
+
+            // Count occurrences
+            const statusCounts = {
+                'pending': 0,
+                'selected': 0,
+                'rejected': 0,
+                'waitlisted': 0
+            };
+
+            statuses.forEach(status => {
+                if (statusCounts.hasOwnProperty(status)) {
+                    statusCounts[status]++;
+                } else {
+                    statusCounts['pending']++; // Default fallback
+                }
+            });
+
+            // Setup Chart
+            const ctx = document.getElementById('statusChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Selected', 'Pending', 'Waitlisted', 'Rejected'],
+                    datasets: [{
+                        data: [
+                            statusCounts['selected'],
+                            statusCounts['pending'],
+                            statusCounts['waitlisted'],
+                            statusCounts['rejected']
+                        ],
+                        backgroundColor: [
+                            '#2ecc71',
+                            '#95a5a6',
+                            '#f1c40f',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: "'Poppins', sans-serif",
+                                    size: 11
+                                },
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: '#ddd',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: true,
+                            usePointStyle: true
+                        }
+                    },
+                    cutout: '70%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- Team Member Details Modal -->
+    <div class="modal fade" id="teamMemberModal" tabindex="-1" aria-labelledby="teamMemberModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="teamMemberModalLabel">Team Members Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="teamMemberContent">
+                        <!-- Team member details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Proof Modal -->
+    <div class="modal fade" id="paymentProofModal" tabindex="-1" aria-labelledby="paymentProofModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="paymentProofModalLabel">Payment Proof</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="paymentProofContent" class="d-flex justify-content-center align-items-center"
+                        style="min-height: 200px;">
+                        <!-- Payment proof content will be loaded here -->
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a id="downloadProofBtn" href="#" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Proof Modal Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const paymentProofModal = new bootstrap.Modal(document.getElementById('paymentProofModal'));
+            const paymentProofContent = document.getElementById('paymentProofContent');
+            const downloadProofBtn = document.getElementById('downloadProofBtn');
+
+            document.querySelectorAll('.view-proof-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const url = this.getAttribute('data-url');
+                    const teamName = this.getAttribute('data-team');
+
+                    // Update download link
+                    downloadProofBtn.href = url;
+
+                    // Update content
+                    paymentProofContent.innerHTML = '';
+
+                    if (url && url !== '#') {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.className = 'img-fluid rounded shadow-sm';
+                        img.alt = `Payment proof for ${teamName}`;
+                        img.style.maxHeight = '70vh';
+
+                        // Handle load error
+                        img.onerror = function () {
+                            paymentProofContent.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>Failed to load image</div>';
+                        };
+
+                        paymentProofContent.appendChild(img);
+                    } else {
+                        paymentProofContent.innerHTML = '<div class="text-warning"><i class="fas fa-exclamation-circle fa-2x mb-2"></i><br>No proof available</div>';
+                    }
+
+                    paymentProofModal.show();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
