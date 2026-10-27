@@ -233,39 +233,6 @@
                 window.print();
             });
         }
-        async function uploadPDFInBackground() {
-            try {
-                const element = document.getElementById('receipt-content');
-                if (!element) return;
-                const opt = {
-                    margin:       0.4,
-                    filename:     'Ignite_2K27_Registration_Receipt.pdf',
-                    image:        { type: 'jpeg', quality: 0.95 },
-                    html2canvas:  { 
-                        scale: 1.5, 
-                        useCORS: true,
-                        scrollY: 0,
-                        backgroundColor: '#ffffff'
-                    },
-                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-                };
-                const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
-                const formData = new FormData();
-                formData.append('pdf', pdfBlob, 'Ignite_2K27_Registration_Receipt.pdf');
-                const response = await fetch('/send-receipt-email/', {
-                    method: 'POST',
-                    body: formData
-                });
-                if (response.ok) {
-                    console.log('PDF receipt sent to email successfully.');
-                }
-            } catch (err) {
-                console.warn("Background receipt delivery notification:", err);
-            }
-        }
-        window.addEventListener('load', function() {
-            uploadPDFInBackground();
-        });
     </script>
 </body>
 </html>

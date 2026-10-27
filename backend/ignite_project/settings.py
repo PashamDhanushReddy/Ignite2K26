@@ -140,3 +140,4 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'IGNITE 2K27 <ignite2k27@gmail.com>')
 EMAIL_TIMEOUT = 10
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')

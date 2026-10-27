@@ -216,19 +216,70 @@ def send_registration_email(reg, members, college_name):
         print("[Ignite Email] No valid recipient emails found. Skipping email.", flush=True)
         return
 
+    subject = '🎉 Registration Confirmed – Ignite 2K27 | NRCM'
+    from_name = 'IGNITE 2K27'
+    from_email = 'ignite2k27@gmail.com'
     try:
-        print(f"[Ignite Email] Sending confirmation email to {recipient_emails}...", flush=True)
+        from email.utils import parseaddr
+        parsed_name, parsed_email = parseaddr(settings.DEFAULT_FROM_EMAIL)
+        if parsed_email:
+            from_email = parsed_email
+        if parsed_name:
+            from_name = parsed_name
+    except Exception:
+        pass
+
+    brevo_api_key = getattr(settings, 'BREVO_API_KEY', '') or os.environ.get('BREVO_API_KEY', '')
+
+    if brevo_api_key and brevo_api_key.strip():
+        try:
+            import urllib.request
+            import urllib.error
+            import json
+
+            print(f"[Ignite Email] Sending via Brevo HTTPS REST API (port 443) to {recipient_emails}...", flush=True)
+            url = 'https://api.brevo.com/v3/smtp/email'
+            headers = {
+                'accept': 'application/json',
+                'api-key': brevo_api_key.strip(),
+                'content-type': 'application/json'
+            }
+            payload = {
+                'sender': {'name': from_name, 'email': from_email},
+                'to': [{'email': email} for email in recipient_emails],
+                'subject': subject,
+                'htmlContent': html_body,
+                'textContent': plain_text
+            }
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode('utf-8'),
+                headers=headers,
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                res_body = resp.read().decode('utf-8')
+                print(f"[Ignite Email] Successfully sent via Brevo HTTPS API: {res_body}", flush=True)
+                return
+        except urllib.error.HTTPError as he:
+            err_body = he.read().decode('utf-8', errors='ignore')
+            print(f"[Ignite Email] Brevo HTTPS API error ({he.code}): {err_body}", flush=True)
+        except Exception as e:
+            print(f"[Ignite Email] Brevo HTTPS API exception: {e}", flush=True)
+
+    try:
+        print(f"[Ignite Email] Sending via SMTP to {recipient_emails}...", flush=True)
         msg = EmailMultiAlternatives(
-            subject='🎉 Registration Confirmed – Ignite 2K27 | NRCM',
+            subject=subject,
             body=plain_text,
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=recipient_emails,
         )
         msg.attach_alternative(html_body, "text/html")
         sent = msg.send(fail_silently=False)
-        print(f"[Ignite Email] Successfully sent confirmation email to {recipient_emails} (count={sent})", flush=True)
+        print(f"[Ignite Email] Successfully sent confirmation email via SMTP (count={sent})", flush=True)
     except Exception as e:
-        print(f"[Ignite Email] Failed to send confirmation email: {e}", flush=True)
+        print(f"[Ignite Email] Failed to send confirmation email via SMTP: {e}", flush=True)
 
 
 def get_registration_context(request):
