@@ -218,8 +218,11 @@
             </div>
 
             <div class="actions">
-                <button onclick="window.print()" class="btn">
-                    🖨️ Print / Save as PDF
+                <button onclick="downloadReceiptPDF()" class="btn" style="background-color: #4f46e5;">
+                    📥 Download PDF Receipt
+                </button>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    🖨️ Print Receipt
                 </button>
                 {% if whatsapp_link %}
                 <a href="{{ whatsapp_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
@@ -236,5 +239,36 @@
             <p style="margin: 0;">&copy; 2027 IGNITE · Narsimha Reddy Engineering College. All rights reserved.</p>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function downloadReceiptPDF() {
+            const btn = document.querySelector('button[onclick="downloadReceiptPDF()"]');
+            const originalText = btn ? btn.innerHTML : '';
+            if (btn) btn.innerHTML = '⏳ Generating PDF...';
+
+            const element = document.querySelector('.container');
+            const actions = document.querySelector('.actions');
+            if (actions) actions.style.display = 'none';
+
+            const opt = {
+                margin:       [8, 8, 8, 8],
+                filename:     'Ignite_2K27_Registration_Receipt.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                if (actions) actions.style.display = 'flex';
+                if (btn) btn.innerHTML = originalText;
+            }).catch(err => {
+                console.error("PDF download error:", err);
+                if (actions) actions.style.display = 'flex';
+                if (btn) btn.innerHTML = originalText;
+                window.print();
+            });
+        }
+    </script>
 </body>
 </html>

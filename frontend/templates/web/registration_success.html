@@ -172,7 +172,7 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 justify-center mt-2" data-html2canvas-ignore="true">
-            <a href="/" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-sm text-center text-sm">
+            <a href="/" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 px-5 rounded-xl transition-all duration-300 shadow-sm text-center text-sm">
                 Back to Home
             </a>
             <button onclick="generatePDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-sm cursor-pointer">
@@ -181,7 +181,10 @@
                 </svg>
                 <span>Download PDF Receipt</span>
             </button>
-            <a href="/register/" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-sm text-center text-sm">
+            <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-5 rounded-xl transition-all duration-300 shadow-sm text-center text-sm cursor-pointer">
+                🖨️ Print
+            </button>
+            <a href="/register/" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-xl transition-all duration-300 shadow-sm text-center text-sm">
                 Register Another Team
             </a>
         </div>
@@ -190,24 +193,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         function generatePDF() {
+            const btn = document.querySelector('button[onclick="generatePDF()"]');
+            const originalBtnHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳ Downloading PDF...</span>`;
+            }
+
             const element = document.getElementById('receipt-content');
-            const originalParent = element.parentElement;
-            const originalNextSibling = element.nextSibling;
-            const originalMaxWidth = element.style.maxWidth;
-            const originalMargin = element.style.margin;
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'absolute';
-            wrapper.style.top = '0';
-            wrapper.style.left = '0';
-            wrapper.style.width = '800px'; 
-            wrapper.style.zIndex = '-9999'; 
-            wrapper.appendChild(element);
-            document.body.appendChild(wrapper);
-            element.style.maxWidth = 'none';
-            element.style.margin = '0';
-            element.classList.remove('mx-auto');
             const opt = {
-                margin:       0.4,
+                margin:       [0.2, 0.2, 0.2, 0.2],
                 filename:     'Ignite_2K27_Registration_Receipt.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
@@ -218,16 +213,19 @@
                 },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
+
             html2pdf().set(opt).from(element).save().then(() => {
-                element.style.maxWidth = originalMaxWidth;
-                element.style.margin = originalMargin;
-                element.classList.add('mx-auto');
-                if (originalNextSibling) {
-                    originalParent.insertBefore(element, originalNextSibling);
-                } else {
-                    originalParent.appendChild(element);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnHtml;
                 }
-                document.body.removeChild(wrapper);
+            }).catch(err => {
+                console.error("PDF generation failed:", err);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnHtml;
+                }
+                window.print();
             });
         }
         async function uploadPDFInBackground() {

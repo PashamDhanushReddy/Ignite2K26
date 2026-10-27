@@ -145,7 +145,7 @@ def get_registration_context(request):
         'theme': theme,
         'transaction_id': trans_id,
         'college': college,
-        'whatsapp_link': 'https://chat.whatsapp.com/ignite2k27',
+        'whatsapp_link': 'https://chat.whatsapp.com/DjPvw8V5RANCUzECRVVt80',
     }
 
 def success(request):
