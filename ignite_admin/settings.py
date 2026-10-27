@@ -37,7 +37,12 @@ CSRF_TRUSTED_ORIGINS = [
     'https://127.0.0.1:8000',
     'http://localhost:8000',
     'https://localhost:8000',
+    'https://*.onrender.com',
 ]
+
+_csrf_env = os.getenv('CSRF_TRUSTED_ORIGINS')
+if _csrf_env:
+    CSRF_TRUSTED_ORIGINS.extend([origin.strip() for origin in _csrf_env.split(',') if origin.strip()])
 
 # Application definition
 
