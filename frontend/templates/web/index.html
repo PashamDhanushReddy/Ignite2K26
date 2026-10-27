@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title>Ignite 2K27 - NRCM National Level Project Expo</title>
     <meta name="description"
         content="Ignite 2K27 - National Level Project Expo Challenge at Narsimha Reddy Engineering College (NRCM). Compete, innovate, and showcase your engineering prowess.">
@@ -21,6 +22,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: false,
             theme: {
                 extend: {
                     colors: {
@@ -66,6 +68,9 @@
         }
     </script>
     <style type="text/tailwindcss">
+        :root, html, body {
+            color-scheme: light !important;
+        }
         @layer utilities {
             .text-sunset-gradient {
                 background: linear-gradient(135deg, #ff3b5c 0%, #ff7849 50%, #8b5cf6 100%);
@@ -87,7 +92,8 @@
 </head>
 
 <body
-    class="bg-[#faf8fc] text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-700 overflow-x-hidden min-h-screen relative">
+    class="bg-[#faf8fc] text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-700 overflow-x-hidden min-h-screen relative"
+    style="color-scheme: light;">
 
     <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-[#faf8fc]">
         <div

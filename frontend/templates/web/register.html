@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
     <title>Register - Ignite 2K27 | NRCM National Level Project Expo</title>
     <meta name="description"
         content="Register your team for Ignite 2K27 - National Level Project Expo Challenge at Narsimha Reddy Engineering College (NRCM).">
@@ -21,6 +22,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: false,
             theme: {
                 extend: {
                     colors: {
@@ -55,6 +57,9 @@
         }
     </script>
     <style type="text/tailwindcss">
+        :root, html, body {
+            color-scheme: light !important;
+        }
         @layer utilities {
             .text-sunset-gradient {
                 background: linear-gradient(135deg, #ff3b5c 0%, #ff7849 50%, #8b5cf6 100%);
@@ -71,7 +76,7 @@
     </style>
 </head>
 
-<body class="bg-[#faf8fc] text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-700 overflow-x-hidden min-h-screen relative flex flex-col justify-between">
+<body class="bg-[#faf8fc] text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-700 overflow-x-hidden min-h-screen relative flex flex-col justify-between" style="color-scheme: light;">
 
     <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-[#faf8fc]">
         <div class="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-[#ffe4e6] via-[#fed7aa] to-[#fce7f3] opacity-70 filter blur-[90px] top-[-120px] left-[-100px] animate-pulse-slow"></div>
