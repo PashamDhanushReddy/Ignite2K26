@@ -71,12 +71,15 @@ def register(request):
                 )
 
                 # Create Team Members
+                first_dept = None
                 for i in range(1, team_size + 1):
                     name = request.POST.get(f'member_name_{i}')
                     email = request.POST.get(f'member_email_{i}')
                     mobile = request.POST.get(f'member_mobile_{i}')
                     roll = request.POST.get(f'member_roll_{i}')
                     dept = request.POST.get(f'member_dept_{i}')
+                    if i == 1:
+                        first_dept = dept
                     tshirt = request.POST.get(f'member_tshirt_{i}')
                     food = request.POST.get(f'member_food_{i}')
                     
@@ -90,7 +93,12 @@ def register(request):
                         tshirt_size=tshirt,
                         food_preference=food
                     )
-                
+
+                if first_dept and not reg.project_category:
+                    reg.project_category = first_dept
+                    reg.save(update_fields=['project_category'])
+
+                request.session['registration_id'] = reg.id
                 messages.success(request, "Registration successful! Good luck for Ignite 2K27.")
                 return redirect('success')
 
@@ -101,8 +109,68 @@ def register(request):
     return render(request, 'web/register.html')
 
 
+def get_registration_context(request):
+    reg = None
+    try:
+        from django.db import connection
+        if connection.connection and connection.connection.closed:
+            connection.connect()
+        reg_id = request.session.get('registration_id')
+        if reg_id:
+            reg = Registration.objects.filter(id=reg_id).first()
+        if not reg:
+            reg = Registration.objects.order_by('-created_at').first()
+    except Exception:
+        try:
+            from django.db import connection
+            connection.close()
+            reg_id = request.session.get('registration_id')
+            if reg_id:
+                reg = Registration.objects.filter(id=reg_id).first()
+            if not reg:
+                reg = Registration.objects.order_by('-created_at').first()
+        except Exception:
+            reg = None
+
+    college = 'Narsimha Reddy Engineering College'
+    if reg:
+        if reg.college_selection == 'OTHER' and reg.college_name_other:
+            college = reg.college_name_other
+        elif reg.college_selection == 'NRCM':
+            college = 'Narsimha Reddy Engineering College (NRCM)'
+
+    project_title = reg.project_title if reg else 'Smart Project Team'
+    team_size = reg.team_size if reg else 2
+    team_leader = reg.team_leader_name if reg else 'Team Lead'
+    theme = reg.project_category if (reg and reg.project_category) else 'Engineering Expo'
+    trans_id = reg.transaction_id if (reg and reg.transaction_id) else ('Recorded (NRCM Student)' if (reg and reg.college_selection == 'NRCM') else 'Recorded')
+
+    return {
+        'registration': reg,
+        'team_name': project_title,
+        'project_title': project_title,
+        'team_size': team_size,
+        'team_leader_name': team_leader,
+        'theme': theme,
+        'transaction_id': trans_id,
+        'college': college,
+        'whatsapp_link': 'https://chat.whatsapp.com/ignite2k27',
+    }
+
+
 def success(request):
-    return render(request, 'web/success.html')
+    context = get_registration_context(request)
+    return render(request, 'web/registration_success.html', context)
+
+
+def receipt(request):
+    context = get_registration_context(request)
+    return render(request, 'web/registration_receipt.html', context)
+
+
+def pdf_receipt(request):
+    context = get_registration_context(request)
+    return render(request, 'web/pdf_receipt.html', context)
 
 from django.http import JsonResponse
 from django.templatetags.static import static
