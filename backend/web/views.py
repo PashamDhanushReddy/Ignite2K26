@@ -104,7 +104,7 @@ def register(request):
                 thread = threading.Thread(
                     target=send_registration_email,
                     args=(reg, members, college_name),
-                    daemon=True
+                    daemon=False
                 )
                 thread.start()
 
@@ -207,11 +207,17 @@ def send_registration_email(reg, members, college_name):
         f"All the best!\nIgnite 2K27 Organizing Committee"
     )
 
-    recipient_emails = list({m.email for m in members if m.email})
+    recipient_emails = list({m.email.strip() for m in members if m.email and m.email.strip()})
+    if reg.team_leader_email and reg.team_leader_email.strip() and reg.team_leader_email.strip() not in recipient_emails:
+        recipient_emails.append(reg.team_leader_email.strip())
+    recipient_emails = [e for e in recipient_emails if '@' in e]
+
     if not recipient_emails:
+        print("[Ignite Email] No valid recipient emails found. Skipping email.", flush=True)
         return
 
     try:
+        print(f"[Ignite Email] Sending confirmation email to {recipient_emails}...", flush=True)
         msg = EmailMultiAlternatives(
             subject='🎉 Registration Confirmed – Ignite 2K27 | NRCM',
             body=plain_text,
@@ -219,9 +225,10 @@ def send_registration_email(reg, members, college_name):
             to=recipient_emails,
         )
         msg.attach_alternative(html_body, "text/html")
-        msg.send(fail_silently=False)
+        sent = msg.send(fail_silently=False)
+        print(f"[Ignite Email] Successfully sent confirmation email to {recipient_emails} (count={sent})", flush=True)
     except Exception as e:
-        print(f"[Ignite Email] Failed to send confirmation email: {e}")
+        print(f"[Ignite Email] Failed to send confirmation email: {e}", flush=True)
 
 
 def get_registration_context(request):
