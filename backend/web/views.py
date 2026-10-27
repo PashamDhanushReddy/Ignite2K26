@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from .models import Registration, TeamMember
 from django.contrib import messages
 from django.db import transaction, IntegrityError
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.conf import settings
+import threading
 
 def index(request):
     domains = [
@@ -92,6 +95,19 @@ def register(request):
 
                 request.session['registration_id'] = reg.id
                 messages.success(request, "Registration successful! Good luck for Ignite 2K27.")
+
+                members = list(TeamMember.objects.filter(registration=reg))
+                college_name = 'Narsimha Reddy Engineering College (NRCM)'
+                if reg.college_selection == 'OTHER' and reg.college_name_other:
+                    college_name = reg.college_name_other
+
+                thread = threading.Thread(
+                    target=send_registration_email,
+                    args=(reg, members, college_name),
+                    daemon=True
+                )
+                thread.start()
+
                 return redirect('success')
 
         except Exception as e:
@@ -99,6 +115,114 @@ def register(request):
             return render(request, 'web/register.html')
 
     return render(request, 'web/register.html')
+
+
+def send_registration_email(reg, members, college_name):
+    member_rows = ''.join(
+        f'<tr><td style="padding:6px 10px;border:1px solid #e2e8f0;">{i+1}</td>'
+        f'<td style="padding:6px 10px;border:1px solid #e2e8f0;">{m.name}</td>'
+        f'<td style="padding:6px 10px;border:1px solid #e2e8f0;">{m.department}</td>'
+        f'<td style="padding:6px 10px;border:1px solid #e2e8f0;">{m.roll_no}</td></tr>'
+        for i, m in enumerate(members)
+    )
+
+    trans_display = reg.transaction_id if reg.transaction_id else ('NRCM Student – Recorded' if reg.college_selection == 'NRCM' else 'Recorded')
+
+    html_body = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<style>
+  body {{ font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; color: #1e293b; color-scheme: light; }}
+  .card {{ background: #fff; border-radius: 12px; max-width: 600px; margin: 0 auto; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }}
+  .header {{ background: linear-gradient(135deg, #ff3b5c, #8b5cf6); padding: 32px 24px; text-align: center; color: #fff; }}
+  .header h1 {{ margin: 0; font-size: 28px; font-weight: 900; letter-spacing: 2px; }}
+  .header p {{ margin: 6px 0 0; font-size: 13px; opacity: 0.9; }}
+  .body {{ padding: 28px 24px; }}
+  .badge {{ display: inline-block; background: #dcfce7; color: #16a34a; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }}
+  .section-title {{ font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; margin: 20px 0 8px; }}
+  .info-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }}
+  .info-item {{ background: #f8fafc; border-radius: 8px; padding: 12px; }}
+  .info-item .label {{ font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }}
+  .info-item .value {{ font-size: 14px; color: #1e293b; font-weight: 700; margin-top: 2px; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+  th {{ background: #f1f5f9; padding: 8px 10px; text-align: left; border: 1px solid #e2e8f0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }}
+  .alert {{ background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 6px; padding: 14px 16px; margin-top: 20px; font-size: 13px; color: #1e40af; }}
+  .whatsapp {{ background: #dcfce7; border-left: 4px solid #16a34a; border-radius: 6px; padding: 14px 16px; margin-top: 12px; font-size: 13px; color: #14532d; }}
+  .footer {{ background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 24px; text-align: center; font-size: 11px; color: #94a3b8; }}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>IGNITE 2K27</h1>
+    <p>National Level Project Expo · Narsimha Reddy Engineering College</p>
+  </div>
+  <div class="body">
+    <div class="badge">✅ Registration Confirmed</div>
+    <p style="font-size:15px;margin:0 0 20px;">Dear <strong>{reg.team_leader_name}</strong>, your team has been successfully registered for <strong>Ignite 2K27</strong>!</p>
+    
+    <div class="section-title">Registration Details</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="label">Project Title</div><div class="value">{reg.project_title}</div></div>
+      <div class="info-item"><div class="label">College</div><div class="value">{college_name}</div></div>
+      <div class="info-item"><div class="label">Team Size</div><div class="value">{reg.team_size} Members</div></div>
+      <div class="info-item"><div class="label">Transaction / UTR ID</div><div class="value" style="font-family:monospace;">{trans_display}</div></div>
+      <div class="info-item" style="grid-column:1/-1;"><div class="label">Event Date</div><div class="value" style="color:#dc2626;">February 26, 2027</div></div>
+    </div>
+
+    <div class="section-title">Team Members</div>
+    <table>
+      <thead><tr><th>#</th><th>Name</th><th>Department</th><th>Roll No.</th></tr></thead>
+      <tbody>{member_rows}</tbody>
+    </table>
+
+    <div class="alert">
+      📋 <strong>Next Steps:</strong> Keep your project presentation and working model/prototype ready for the offline expo on <strong>February 26, 2027</strong> at NRCM Campus, Maisammaguda (V), Kompally, Hyderabad.
+    </div>
+    <div class="whatsapp">
+      📱 <strong>Join the official WhatsApp group</strong> for updates:<br>
+      <a href="https://chat.whatsapp.com/DjPvw8V5RANCUzECRVVt80" style="color:#16a34a;">https://chat.whatsapp.com/DjPvw8V5RANCUzECRVVt80</a>
+    </div>
+  </div>
+  <div class="footer">© 2027 IGNITE · Narsimha Reddy Engineering College. All rights reserved.</div>
+</div>
+</body>
+</html>
+"""
+
+    plain_text = (
+        f"IGNITE 2K27 - Registration Confirmed\n\n"
+        f"Dear {reg.team_leader_name},\n\n"
+        f"Your team has been successfully registered!\n\n"
+        f"Project Title: {reg.project_title}\n"
+        f"College: {college_name}\n"
+        f"Team Size: {reg.team_size} members\n"
+        f"Transaction ID: {trans_display}\n"
+        f"Event Date: February 26, 2027\n\n"
+        f"WhatsApp Group: https://chat.whatsapp.com/DjPvw8V5RANCUzECRVVt80\n\n"
+        f"Venue: NRCM Campus, Maisammaguda (V), Kompally, Hyderabad, Telangana.\n\n"
+        f"All the best!\nIgnite 2K27 Organizing Committee"
+    )
+
+    recipient_emails = list({m.email for m in members if m.email})
+    if not recipient_emails:
+        return
+
+    try:
+        msg = EmailMultiAlternatives(
+            subject='🎉 Registration Confirmed – Ignite 2K27 | NRCM',
+            body=plain_text,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=recipient_emails,
+        )
+        msg.attach_alternative(html_body, "text/html")
+        msg.send(fail_silently=False)
+    except Exception as e:
+        print(f"[Ignite Email] Failed to send confirmation email: {e}")
+
 
 def get_registration_context(request):
     reg = None
