@@ -91,7 +91,7 @@ def register(request):
                         food_preference=food
                     )
                 
-                messages.success(request, "Registration successful! Good luck for Ignite 2K26.")
+                messages.success(request, "Registration successful! Good luck for Ignite 2K27.")
                 return redirect('success')
 
         except Exception as e:
@@ -105,15 +105,23 @@ def success(request):
     return render(request, 'web/success.html')
 
 from django.http import JsonResponse
+from django.templatetags.static import static
 from .models import GalleryImage
 
 def gallery_api(request):
-    images = GalleryImage.objects.all().order_by('-created_at')
+    # Curated official Ignite 2K26/2K27 Expo photos
+    expo_photos = [
+        'SSV07033', 'SSV07054', 'SSV07027', 'SSV07026', 'SSV06674',
+        'SSV06660', 'SSV06609', 'SSV06598', 'SSV06287', 'SSV06259',
+        'SSV06254', 'SSV06243', 'SSV06239', 'SSV06207'
+    ]
     data = [
         {
-            'url': img.image.url,
-            'alt': img.alt_text or "Gallery Image"
+            'url': static(f'web/images/gallery/{name}.webp'),
+            'fallback_url': static(f'web/images/gallery/{name}.jpg'),
+            'original_url': static(f'web/images/{name}.JPG'),
+            'alt': f'Ignite Expo Photo {name}'
         }
-        for img in images
+        for name in expo_photos
     ]
     return JsonResponse({'images': data})
