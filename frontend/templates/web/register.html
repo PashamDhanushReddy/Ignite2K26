@@ -9,7 +9,6 @@
     <meta name="description"
         content="Register your team for Ignite 2K27 - National Level Project Expo Challenge at Narsimha Reddy Engineering College (NRCM).">
 
-    <!-- Fonts: Plus Jakarta Sans & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -17,10 +16,8 @@
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
-    <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -76,7 +73,6 @@
 
 <body class="bg-[#faf8fc] text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-700 overflow-x-hidden min-h-screen relative flex flex-col justify-between">
 
-    <!-- Aurora Mesh Background -->
     <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-[#faf8fc]">
         <div class="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-[#ffe4e6] via-[#fed7aa] to-[#fce7f3] opacity-70 filter blur-[90px] top-[-120px] left-[-100px] animate-pulse-slow"></div>
         <div class="absolute w-[650px] h-[650px] rounded-full bg-gradient-to-bl from-[#e9d5ff] via-[#f5d0fe] to-[#fbcfe8] opacity-80 filter blur-[100px] top-[5%] right-[-140px]"></div>
@@ -84,10 +80,8 @@
         <div class="absolute w-[550px] h-[550px] rounded-full bg-gradient-to-tl from-[#e0e7ff] via-[#f3e8ff] to-[#ffe4e6] opacity-60 filter blur-[90px] bottom-[-100px] right-[5%]"></div>
     </div>
 
-    <!-- Top Navigation Bar -->
     <nav class="fixed top-0 left-0 w-full z-50 px-4 md:px-8 py-3.5 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-[0_2px_15px_rgba(0,0,0,0.02)] transition-all">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Brand Logo -->
             <a href="/" class="flex items-center gap-3.5 group">
                 <div class="h-11 px-2.5 py-1 bg-white rounded-xl border border-slate-200/80 shadow-sm flex items-center gap-2 group-hover:border-slate-300 transition-colors">
                     <img src="{% static 'web/images/nrcm_logo.png' %}" alt="NRCM Logo" class="h-7 w-auto object-contain">
@@ -98,7 +92,6 @@
                 </div>
             </a>
 
-            <!-- Center Navigation Links -->
             <div class="hidden lg:flex items-center gap-8">
                 <a href="/" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Home</a>
                 <a href="/#gallery" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Gallery</a>
@@ -108,7 +101,6 @@
                 <a href="/#team" class="text-xs uppercase tracking-widest font-bold text-slate-700 hover:text-[#ff3b5c] transition-colors py-1">Team</a>
             </div>
 
-            <!-- Right CTA Button -->
             <div class="hidden md:flex items-center gap-3">
                 <a href="/" class="px-6 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2">
                     <i class="ri-arrow-left-line"></i>
@@ -116,14 +108,12 @@
                 </a>
             </div>
 
-            <!-- Mobile Menu Toggle Button -->
             <button class="lg:hidden w-10 h-10 rounded-xl bg-slate-100/80 flex items-center justify-center text-slate-800 text-2xl focus:outline-none" onclick="toggleMobileMenu()" aria-label="Toggle navigation">
                 <i class="ri-menu-3-line" id="menuIcon"></i>
             </button>
         </div>
     </nav>
 
-    <!-- Mobile Menu Drawer -->
     <div id="mobileMenu" class="fixed inset-0 z-40 bg-white/95 backdrop-blur-2xl transform translate-x-full transition-transform duration-300 lg:hidden flex flex-col items-center justify-center gap-6 p-6">
         <a href="/" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Home</a>
         <a href="/#gallery" onclick="toggleMobileMenu()" class="text-xl font-bold text-slate-900 uppercase tracking-widest hover:text-[#ff3b5c] transition-colors">Gallery</a>
@@ -142,14 +132,11 @@
         </div>
     </div>
 
-    <!-- Main Container -->
     <main class="pt-24 pb-12 flex-grow">
         <div class="max-w-4xl mx-auto px-4 py-4 md:py-8 relative z-10">
 
-            <!-- Form Container in Clean Light Glass Style -->
             <div class="glass-card p-6 sm:p-10 md:p-12 rounded-3xl border border-white/90 shadow-glass" data-aos="fade-up" data-aos-duration="800">
 
-                <!-- Header -->
                 <div class="text-center max-w-xl mx-auto mb-10">
                     <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-rose-50 text-[#ff3b5c] text-xs font-bold uppercase tracking-wider mb-2">
                         Team Registration
@@ -160,7 +147,6 @@
                     <p class="text-slate-500 text-sm mt-2">Fill in your team details and upload your project abstract to secure your participation slot.</p>
                 </div>
 
-                <!-- Django Messages -->
                 {% if messages %}
                 <div class="mb-8 space-y-3">
                     {% for message in messages %}
@@ -175,21 +161,18 @@
                 <form method="POST" enctype="multipart/form-data" id="regForm" class="space-y-10">
                     {% csrf_token %}
 
-                    <!-- Section 1: Project Details -->
                     <div class="space-y-6">
                         <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
                             <span class="w-8 h-8 rounded-xl bg-rose-50 text-[#ff3b5c] font-black text-sm flex items-center justify-center">1</span>
                             <h3 class="text-lg font-extrabold text-slate-900 font-display">Project Information</h3>
                         </div>
 
-                        <!-- Project Title -->
                         <div class="space-y-2">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Project Title *</label>
                             <input type="text" name="project_title" required placeholder="e.g. Smart IoT Grid Monitoring System"
                                 class="w-full px-5 py-3.5 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] focus:ring-2 focus:ring-rose-100 transition-all text-sm font-medium">
                         </div>
 
-                        <!-- College Selection -->
                         <div class="space-y-2">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Institution / College Name *</label>
                             <div class="relative">
@@ -204,7 +187,6 @@
                             </div>
                         </div>
 
-                        <!-- Other College Name Input (Dynamic) -->
                         <div id="otherCollegeGroup" class="hidden space-y-2">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Enter Your College Name *</label>
                             <input type="text" name="college_name_other" placeholder="e.g. Osmania University / JNTUH / BITS"
@@ -212,7 +194,6 @@
                         </div>
                     </div>
 
-                    <!-- Section 2: Team Members -->
                     <div class="space-y-6">
                         <div class="flex items-center justify-between pb-3 border-b border-slate-200 flex-wrap gap-4">
                             <div class="flex items-center gap-3">
@@ -220,7 +201,6 @@
                                 <h3 class="text-lg font-extrabold text-slate-900 font-display">Team Composition (2-6 Members)</h3>
                             </div>
 
-                            <!-- Team Size Select -->
                             <div class="flex items-center gap-2">
                                 <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Size:</span>
                                 <div class="relative">
@@ -240,18 +220,15 @@
                         </div>
 
                         <div id="teamMembersContainer" class="space-y-5">
-                            <!-- Dynamic Member Rows injected by JavaScript -->
                         </div>
                     </div>
 
-                    <!-- Section 3: Uploads & Payment -->
                     <div class="space-y-6">
                         <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
                             <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 font-black text-sm flex items-center justify-center">3</span>
                             <h3 class="text-lg font-extrabold text-slate-900 font-display">Document & Payment Details</h3>
                         </div>
 
-                        <!-- Abstract / Project Document -->
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Project Abstract Document (PDF/Docx) *</label>
@@ -263,7 +240,6 @@
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-slate-950 file:text-white hover:file:bg-slate-800 cursor-pointer transition-all text-xs">
                         </div>
 
-                        <!-- Payment Section for Non-NRCM Students (Dynamic) -->
                         <div id="paymentSection" class="hidden space-y-5 p-6 rounded-2xl bg-gradient-to-br from-rose-50/60 to-purple-50/60 border border-rose-200/80">
                             <div class="flex items-center gap-2 text-[#ff3b5c] font-bold text-sm">
                                 <i class="ri-bank-card-line text-lg"></i>
@@ -287,7 +263,6 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="pt-6">
                         <button type="submit"
                             class="w-full py-4 rounded-full bg-slate-950 text-white font-extrabold text-sm sm:text-base uppercase tracking-wider hover:bg-slate-800 shadow-pill hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
@@ -300,7 +275,6 @@
         </div>
     </main>
 
-    <!-- Footer Section (Without Organizers) -->
     <footer class="relative z-10 py-10 border-t border-slate-200/80 bg-white/70">
         <div class="max-w-7xl mx-auto px-4 md:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
@@ -330,7 +304,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init({
@@ -339,12 +312,10 @@
             offset: 40,
             easing: 'ease-out-cubic',
         });
-
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const icon = document.getElementById('menuIcon');
             const body = document.body;
-
             if (menu.classList.contains('translate-x-full')) {
                 menu.classList.remove('translate-x-full');
                 icon.classList.remove('ri-menu-3-line');
@@ -357,27 +328,21 @@
                 body.classList.remove('overflow-hidden');
             }
         }
-
         function toggleCollegeInput() {
             const select = document.getElementById('collegeSelect');
             const otherInput = document.getElementById('otherCollegeGroup');
             const paymentSection = document.getElementById('paymentSection');
             const transInput = document.getElementById('transactionIdInput');
             const screenInput = document.getElementById('screenshotInput');
-
             if (select.value === 'OTHER') {
                 otherInput.classList.remove('hidden');
                 otherInput.querySelector('input').required = true;
-
-                // Show payment section
                 paymentSection.classList.remove('hidden');
                 transInput.required = true;
                 screenInput.required = true;
             } else {
                 otherInput.classList.add('hidden');
                 otherInput.querySelector('input').required = false;
-
-                // Hide payment section
                 paymentSection.classList.add('hidden');
                 transInput.required = false;
                 screenInput.required = false;
@@ -385,7 +350,6 @@
                 screenInput.value = '';
             }
         }
-
         function createMemberHtml(i) {
             const isLeader = i === 1;
             return `
@@ -396,21 +360,15 @@
                         </span>
                         <span class="text-[11px] font-semibold text-slate-400">Student ${i} of ${document.getElementById('teamSize').value}</span>
                     </div>
-
                     <div class="space-y-3.5">
-                        <!-- Full Name -->
                         <input type="text" name="member_name_${i}" placeholder="Full Name *" required
                             class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
-
-                        <!-- Email & Mobile -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <input type="email" name="member_email_${i}" placeholder="College Email ID *" required
                                 class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
                             <input type="tel" name="member_mobile_${i}" placeholder="WhatsApp Mobile (10 digits) *" pattern="[6-9][0-9]{9}" maxlength="10" required
                                 class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
                         </div>
-
-                        <!-- Roll No & Department -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <input type="text" name="member_roll_${i}" placeholder="Hall Ticket / Roll No *" required
                                 class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#ff3b5c] text-xs font-medium">
@@ -433,8 +391,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- T-shirt & Food Preference -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div class="relative">
                                 <select name="member_tshirt_${i}" required
@@ -467,18 +423,14 @@
                 </div>
             `;
         }
-
         function generateTeamMembers() {
             const size = parseInt(document.getElementById('teamSize').value);
             const container = document.getElementById('teamMembersContainer');
             container.innerHTML = '';
-
             for (let i = 1; i <= size; i++) {
                 container.insertAdjacentHTML('beforeend', createMemberHtml(i));
             }
         }
-
-        // Initialize with default 2 members
         generateTeamMembers();
     </script>
 </body>

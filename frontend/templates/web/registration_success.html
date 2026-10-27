@@ -52,7 +52,6 @@
     <div class="w-full max-w-2xl mx-auto flex flex-col gap-4">
         <div id="receipt-content" class="success-card border border-slate-200 rounded-xl overflow-hidden relative bg-white">
 
-            <!-- College Header -->
             <div class="px-8 pt-8 pb-4 flex items-center gap-6">
                 <img src="{% static 'web/images/nrcm_logo.png' %}" alt="NRCM Logo" class="w-24 h-24 object-contain">
                 <div class="flex-1 border-l-2 border-slate-200 pl-6">
@@ -62,13 +61,10 @@
                 </div>
             </div>
 
-            <!-- Gradient Line -->
             <div class="gradient-line"></div>
 
-            <!-- Content Area -->
             <div class="p-8 sm:p-12 flex flex-col items-center text-center relative">
 
-                <!-- Decorative elements -->
                 <div class="absolute inset-0 pointer-events-none overflow-hidden">
                     <div class="absolute top-12 left-1/4 w-2 h-2 bg-yellow-400 rounded-full opacity-70"></div>
                     <div class="absolute top-8 left-1/3 text-purple-400 text-lg font-bold opacity-70">+</div>
@@ -78,7 +74,6 @@
                     <div class="absolute top-28 right-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full opacity-70"></div>
                 </div>
 
-                <!-- Success Icon -->
                 <div class="w-24 h-24 bg-green-50 rounded-full border border-green-100 flex items-center justify-center mb-6 relative z-10 shadow-sm">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52' fill='none' stroke='%2310b981' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3.5' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" class="w-12 h-12" alt="Success" />
                 </div>
@@ -94,7 +89,6 @@
                     Your team <strong class="text-indigo-700">{{ team_name }}</strong> has been successfully registered for <span class="text-indigo-700 font-bold">Ignite 2K27</span>. Get ready for the National Level Project Expo on <span class="font-bold text-slate-900">February 26, 2027</span>!
                 </p>
 
-                <!-- Status Banner -->
                 <div class="bg-light-green border border-green-200 rounded-xl w-full py-3.5 px-6 flex items-center justify-center gap-3 mb-6">
                     <div class="w-7 h-7 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23ffffff' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M5 13l4 4L19 7'/%3E%3C/svg%3E" class="w-4 h-4" alt="Check" />
@@ -102,7 +96,6 @@
                     <span class="text-dark-green font-bold text-base sm:text-lg">Team registration confirmed</span>
                 </div>
 
-                <!-- Registration Details Summary -->
                 <div class="w-full bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6 text-left">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Team & Project Details</span>
@@ -146,7 +139,6 @@
                     </div>
                 </div>
 
-                <!-- Next Steps Notification -->
                 <div class="bg-light-purple border border-purple-100 rounded-xl w-full p-5 flex items-start sm:items-center gap-4 text-left">
                     <div class="w-11 h-11 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
                         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='none' stroke='%237e22ce' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'/%3E%3C/svg%3E" class="w-5 h-5" alt="Notification" />
@@ -166,7 +158,6 @@
                 </div>
             </div>
 
-            <!-- Footer Note -->
             <div class="px-8 pb-8">
                 <div class="border-t border-slate-200 pt-5 flex items-center gap-4">
                     <div class="w-9 h-9 bg-purple-50 rounded-full flex items-center justify-center flex-shrink-0">
@@ -180,7 +171,6 @@
             </div>
         </div>
 
-        <!-- Action Buttons (Ignored by html2pdf) -->
         <div class="flex flex-col sm:flex-row gap-3 justify-center mt-2" data-html2canvas-ignore="true">
             <a href="/" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-sm text-center text-sm">
                 Back to Home
@@ -201,30 +191,21 @@
     <script>
         function generatePDF() {
             const element = document.getElementById('receipt-content');
-            
-            // 1. Save original DOM state
             const originalParent = element.parentElement;
             const originalNextSibling = element.nextSibling;
             const originalMaxWidth = element.style.maxWidth;
             const originalMargin = element.style.margin;
-            
-            // 2. Create a clean, absolute wrapper hidden behind the main page
             const wrapper = document.createElement('div');
             wrapper.style.position = 'absolute';
             wrapper.style.top = '0';
             wrapper.style.left = '0';
-            wrapper.style.width = '800px'; // Force perfect desktop layout
-            wrapper.style.zIndex = '-9999'; // Hide it from user view
-            
-            // 3. Move the element into the clean wrapper
+            wrapper.style.width = '800px'; 
+            wrapper.style.zIndex = '-9999'; 
             wrapper.appendChild(element);
             document.body.appendChild(wrapper);
-            
-            // 4. Strip centering rules so it sits perfectly at (0,0) in the wrapper
             element.style.maxWidth = 'none';
             element.style.margin = '0';
             element.classList.remove('mx-auto');
-            
             const opt = {
                 margin:       0.4,
                 filename:     'Ignite_2K27_Registration_Receipt.pdf',
@@ -237,28 +218,22 @@
                 },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
-            
-            // 5. Generate PDF, then restore everything instantly
             html2pdf().set(opt).from(element).save().then(() => {
                 element.style.maxWidth = originalMaxWidth;
                 element.style.margin = originalMargin;
                 element.classList.add('mx-auto');
-                
                 if (originalNextSibling) {
                     originalParent.insertBefore(element, originalNextSibling);
                 } else {
                     originalParent.appendChild(element);
                 }
-                
                 document.body.removeChild(wrapper);
             });
         }
-        
         async function uploadPDFInBackground() {
             try {
                 const element = document.getElementById('receipt-content');
                 if (!element) return;
-                
                 const opt = {
                     margin:       0.4,
                     filename:     'Ignite_2K27_Registration_Receipt.pdf',
@@ -271,28 +246,21 @@
                     },
                     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
                 };
-                
                 const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
-                
                 const formData = new FormData();
                 formData.append('pdf', pdfBlob, 'Ignite_2K27_Registration_Receipt.pdf');
-                
                 const response = await fetch('/send-receipt-email/', {
                     method: 'POST',
                     body: formData
                 });
-                
                 if (response.ok) {
                     console.log('PDF receipt sent to email successfully.');
                 }
             } catch (err) {
-                // Silently log without disrupting user experience
                 console.warn("Background receipt delivery notification:", err);
             }
         }
-        
         window.addEventListener('load', function() {
-            // Optional background email send attempt
             uploadPDFInBackground();
         });
     </script>

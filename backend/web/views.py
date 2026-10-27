@@ -15,21 +15,17 @@ def register(request):
     if request.method == 'POST':
         try:
             with transaction.atomic():
-                # Extract basic info
                 project_title = request.POST.get('project_title')
                 
-                # Team Size from hidden input or calculate (let's use hidden input which is consistent with UI)
                 try:
                     team_size = int(request.POST.get('team_size', 2))
                 except ValueError:
                     team_size = 2
                 
-                # Leader Details from Member 1
                 leader_name = request.POST.get('member_name_1')
                 leader_email = request.POST.get('member_email_1')
                 leader_mobile = request.POST.get('member_mobile_1')
                 
-                # Validation (Min 2, Max 6) is handled nicely by UI, but good to be safe if manual post
                 if team_size < 2: team_size = 2
                 if team_size > 6: team_size = 6
 
@@ -38,12 +34,10 @@ def register(request):
                 
                 trans_id = request.POST.get('transaction_id')
                 
-                # Check uniqueness manually
                 if Registration.objects.filter(project_title=project_title).exists():
                     messages.error(request, "Project Title already exists.")
                     return render(request, 'web/register.html')
                 
-                # Payment validation only for Non-NRCM
                 if college_sel == 'OTHER':
                     if not trans_id or not request.FILES.get('payment_screenshot'):
                         messages.error(request, "Payment details are required for non-NRCM students.")
@@ -56,7 +50,6 @@ def register(request):
                     if not trans_id:
                         trans_id = None 
 
-                # Create Registration
                 reg = Registration.objects.create(
                     project_title=project_title,
                     team_leader_name=leader_name,
@@ -70,7 +63,6 @@ def register(request):
                     project_document=request.FILES.get('project_document')
                 )
 
-                # Create Team Members
                 first_dept = None
                 for i in range(1, team_size + 1):
                     name = request.POST.get(f'member_name_{i}')
@@ -107,7 +99,6 @@ def register(request):
             return render(request, 'web/register.html')
 
     return render(request, 'web/register.html')
-
 
 def get_registration_context(request):
     reg = None
@@ -157,16 +148,13 @@ def get_registration_context(request):
         'whatsapp_link': 'https://chat.whatsapp.com/ignite2k27',
     }
 
-
 def success(request):
     context = get_registration_context(request)
     return render(request, 'web/registration_success.html', context)
 
-
 def receipt(request):
     context = get_registration_context(request)
     return render(request, 'web/registration_receipt.html', context)
-
 
 def pdf_receipt(request):
     context = get_registration_context(request)
@@ -177,7 +165,6 @@ from django.templatetags.static import static
 from .models import GalleryImage
 
 def gallery_api(request):
-    # Curated official Ignite 2K26/2K27 Expo photos
     expo_photos = [
         'SSV07033', 'SSV07054', 'SSV07027', 'SSV07026', 'SSV06674',
         'SSV06660', 'SSV06609', 'SSV06598', 'SSV06287', 'SSV06259',

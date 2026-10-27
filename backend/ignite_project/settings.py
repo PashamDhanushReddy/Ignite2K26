@@ -15,10 +15,8 @@ import os
 import dj_database_url
 from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env
 load_dotenv(BASE_DIR / '.env')
 load_dotenv(BASE_DIR.parent / '.env')
 
@@ -27,13 +25,8 @@ print(f"DEBUG: Template Dir is {BASE_DIR.parent / 'frontend' / 'templates'}")
 if not (BASE_DIR.parent / 'frontend' / 'templates').exists():
     print("WARNING: Template directory does not exist on disk!")
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 SECRET_KEY = os.environ.get('SECRET_KEY', "django-insecure-#tvxql%1=ivd^fc5v7ma-^6s5)m3g==8#*65j6&!gcufey5^8k")
 
-# DEBUG mode: default to True unless specified otherwise or in production
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 allowed_hosts_raw = os.environ.get('ALLOWED_HOSTS', '*')
@@ -42,9 +35,6 @@ ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_raw.split(',') if h.strip()]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -89,20 +79,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ignite_project.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': dj_database_url.config(
         default='postgresql://neondb_owner:npg_9gfoOidrb6XQ@ep-proud-mountain-a1w63arx-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
         conn_max_age=600
     )
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -119,10 +101,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -130,10 +108,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -154,8 +128,5 @@ CLOUDINARY = {
     'api_key': os.environ.get('CLOUDINARY_API_KEY', '642925521879316'),
     'api_secret': os.environ.get('CLOUDINARY_API_SECRET', 'es6U6BGsti-afljcSQsFOT2WQyI'),
 }
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
