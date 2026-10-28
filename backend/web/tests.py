@@ -56,7 +56,6 @@ class SecurityAndRegistrationTests(TestCase):
 
     def test_failed_registration_does_not_redirect_to_success(self):
         """Invalid form submission should render register.html with error and NOT redirect to success."""
-        # Missing required project_document and member details
         post_data = {
             'project_title': 'Incomplete Project',
             'team_size': '2',
@@ -66,7 +65,6 @@ class SecurityAndRegistrationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'web/register.html')
         self.assertEqual(Registration.objects.filter(project_title='Incomplete Project').count(), 0)
-        # Session must not have registration_id
         self.assertIsNone(self.client.session.get('registration_id'))
 
     @patch('web.views.send_registration_email')
@@ -94,16 +92,13 @@ class SecurityAndRegistrationTests(TestCase):
             'member_food_2': 'NON-VEG',
         }
         response = self.client.post(reverse('register'), post_data)
-        # Must redirect to success
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('success'))
 
-        # Check DB records
         reg = Registration.objects.filter(project_title='Smart AI Health Monitor').first()
         self.assertIsNotNone(reg)
         self.assertEqual(reg.team_members.count(), 2)
 
-        # Now following the redirect to success with the active session
         success_response = self.client.get(reverse('success'))
         self.assertEqual(success_response.status_code, 200)
         self.assertContains(success_response, 'Smart AI Health Monitor')

@@ -171,7 +171,6 @@
                 <form method="POST" enctype="multipart/form-data" id="regForm" class="space-y-10">
                     {% csrf_token %}
 
-                    <!-- Anti-bot Security Honeypot -->
                     <div style="position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
                         <label for="website_hp">Security Check (Leave Blank)</label>
                         <input type="text" id="website_hp" name="website_hp" tabindex="-1" autocomplete="off">
@@ -270,9 +269,7 @@
                                 </div>
                             </div>
 
-                            <!-- Payment Card: QR + Details -->
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-white p-5 sm:p-6 rounded-2xl border border-rose-100 shadow-sm">
-                                <!-- QR Code Column -->
                                 <div class="md:col-span-5 flex flex-col items-center justify-center text-center">
                                     <div class="relative group p-2 bg-slate-950 rounded-2xl shadow-xl border-2 border-slate-800 max-w-[210px] w-full transition-transform duration-300 hover:scale-[1.02]">
                                         <img src="{% static 'web/images/payment_qr.png' %}" 
@@ -289,7 +286,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Payment Info & Bank Details -->
                                 <div class="md:col-span-7 space-y-3.5">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold inline-flex items-center gap-1">
@@ -335,7 +331,6 @@
                                 </div>
                             </div>
 
-                            <!-- Verification Inputs -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                                 <div class="space-y-1.5">
                                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Transaction ID (UTR / Ref Number) *</label>
@@ -612,7 +607,6 @@
         }
         generateTeamMembers();
 
-        // Form Submit handler: Prevent duplicate submissions and show loading state
         const regForm = document.getElementById('regForm');
         if (regForm) {
             regForm.addEventListener('submit', function(e) {
@@ -651,10 +645,8 @@
         }
     </script>
 
-    <!-- Website Security (Right-Click & DevTools Protection) -->
     <script src="{% static 'web/js/security.js' %}"></script>
 
-    <!-- QR Modal Lightbox -->
     <div id="qrModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 transition-all" onclick="closeQrModal()">
         <div class="relative bg-slate-950 p-5 rounded-3xl max-w-sm w-full border border-slate-800 shadow-2xl animate-fade-in" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 text-white">

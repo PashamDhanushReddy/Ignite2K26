@@ -1,7 +1,3 @@
-/**
- * Ignite 2K27 - Website Security Module
- * Protects against unauthorized right-click, image scraping, and devtool inspection shortcuts.
- */
 (function() {
     'use strict';
 
@@ -59,14 +55,12 @@
         }, 2000);
     }
 
-    // 1. Disable Right Click (Context Menu)
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         showSecurityToast('Right-click is disabled on this website');
         return false;
     }, { capture: true });
 
-    // 2. Disable Image and Link Dragging
     document.addEventListener('dragstart', function(e) {
         if (e.target && (e.target.nodeName === 'IMG' || e.target.nodeName === 'A')) {
             e.preventDefault();
@@ -74,37 +68,33 @@
         }
     }, { capture: true });
 
-    // 3. Disable DevTools and View Source keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
         const key = e.key ? e.key.toLowerCase() : '';
         const keyCode = e.keyCode || e.which;
 
-        // F12 key
         if (key === 'f12' || keyCode === 123) {
             e.preventDefault();
             showSecurityToast('Developer tools are disabled');
             return false;
         }
 
-        // Ctrl/Cmd + Shift + I/J/C (DevTools)
         if (ctrlOrCmd && e.shiftKey && (key === 'i' || key === 'j' || key === 'c' || keyCode === 73 || keyCode === 74 || keyCode === 67)) {
             e.preventDefault();
             showSecurityToast('Developer tools are disabled');
             return false;
         }
 
-        // Ctrl/Cmd + U (View Source)
         if (ctrlOrCmd && (key === 'u' || keyCode === 85)) {
             e.preventDefault();
             showSecurityToast('Viewing page source is disabled');
             return false;
         }
 
-        // Ctrl/Cmd + S (Save Page)
         if (ctrlOrCmd && (key === 's' || keyCode === 83)) {
             e.preventDefault();
+            showSecurityToast('Save page is disabled');
             return false;
         }
     }, { capture: true });

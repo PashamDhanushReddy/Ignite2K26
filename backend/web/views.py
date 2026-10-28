@@ -25,8 +25,8 @@ from django.core.exceptions import ValidationError
 
 ALLOWED_DOC_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx'}
 ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
-MAX_DOC_SIZE = 10 * 1024 * 1024   # 10 MB
-MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
+MAX_DOC_SIZE = 10 * 1024 * 1024
+MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
 VALID_DEPARTMENTS = {'CSE', 'AIML', 'CSE-CS', 'CSE-DS', 'IT', 'ECE', 'EEE', 'MECH', 'CIVIL'}
 VALID_TSHIRTS = {'S', 'M', 'L', 'XL', 'XXL', 'XXXL'}
@@ -35,12 +35,10 @@ VALID_FOODS = {'VEG', 'NON-VEG'}
 def register(request):
     if request.method == 'POST':
         try:
-            # 1. Anti-spam honeypot detection
             if request.POST.get('website_hp'):
                 messages.error(request, "Registration request rejected due to suspicious activity.")
                 return render(request, 'web/register.html')
 
-            # 2. Project Title validation
             project_title = (request.POST.get('project_title') or '').strip()
             if not project_title or len(project_title) < 3:
                 messages.error(request, "Please enter a valid Project Title (at least 3 characters).")
@@ -54,7 +52,6 @@ def register(request):
                 messages.error(request, f"A project with the title '{project_title}' has already been registered.")
                 return render(request, 'web/register.html')
 
-            # 3. Team size validation
             try:
                 team_size = int(request.POST.get('team_size', 2))
                 if team_size < 2 or team_size > 6:
@@ -64,7 +61,6 @@ def register(request):
                 messages.error(request, "Invalid team size specified.")
                 return render(request, 'web/register.html')
 
-            # 4. College Selection & Payment details validation
             college_sel = request.POST.get('college_selection', 'NRCM')
             if college_sel not in ('NRCM', 'OTHER'):
                 college_sel = 'NRCM'
@@ -92,7 +88,6 @@ def register(request):
                     messages.error(request, f"The Transaction / UTR ID '{trans_id}' has already been used.")
                     return render(request, 'web/register.html')
 
-            # 5. File upload validation (Screenshots)
             if payment_screenshot:
                 if payment_screenshot.size > MAX_IMAGE_SIZE:
                     messages.error(request, "Payment screenshot file size must be under 5MB.")
@@ -102,7 +97,6 @@ def register(request):
                     messages.error(request, f"Invalid payment screenshot format (.{img_ext}). Allowed formats: JPG, JPEG, PNG, WEBP.")
                     return render(request, 'web/register.html')
 
-            # 6. File upload validation (Project Document / Abstract)
             project_doc = request.FILES.get('project_document')
             if not project_doc:
                 messages.error(request, "Project abstract / presentation document is required.")
@@ -117,7 +111,6 @@ def register(request):
                 messages.error(request, f"Invalid project document format (.{doc_ext}). Allowed formats: PDF, DOC, DOCX, PPT, PPTX.")
                 return render(request, 'web/register.html')
 
-            # 7. Team Members validation
             mobile_regex = re.compile(r'^[6-9]\d{9}$')
             members_data = []
             seen_roll_numbers = set()
@@ -190,7 +183,6 @@ def register(request):
                     'food_preference': food,
                 })
 
-            # 8. Create Registration and Team Members in Atomic Transaction
             with transaction.atomic():
                 reg = Registration.objects.create(
                     project_title=project_title,
@@ -224,14 +216,12 @@ def register(request):
                 if reg.college_selection == 'OTHER' and reg.college_name_other:
                     college_name = reg.college_name_other
 
-                # GUARANTEE: Email is dispatched ONLY IF the database transaction successfully commits!
                 transaction.on_commit(lambda: threading.Thread(
                     target=send_registration_email,
                     args=(reg, created_members, college_name),
                     daemon=False
                 ).start())
 
-            # Store successful registration ID in session
             request.session['registration_id'] = reg.id
             messages.success(request, "Registration successful! Good luck for Ignite 2K27.")
             return redirect('success')
