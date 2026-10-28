@@ -169,3 +169,40 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==========================================
+# HIGH SECURITY CONFIGURATION
+# ==========================================
+
+# Clickjacking Protection
+X_FRAME_OPTIONS = 'DENY'
+
+# MIME-Type Sniffing Protection
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Browser XSS Filter
+SECURE_BROWSER_XSS_FILTER = True
+
+# Referrer Policy
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Reverse Proxy SSL detection (critical for Render, Heroku, etc.)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# HTTPS & HSTS Settings (active when not in local DEBUG mode)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year HSTS
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# Session & Cookie Security
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_AGE = 86400 * 7  # 7 days
+
+CSRF_COOKIE_HTTPONLY = False  # Allows AJAX getCookie('csrftoken')
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
+

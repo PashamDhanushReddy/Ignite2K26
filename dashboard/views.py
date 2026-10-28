@@ -18,15 +18,32 @@ from django.db.models.functions import TruncDate
 # Import models
 from website_fixed.models import WebRegistration, WebTeammember
 
+import time
+
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    failed_attempts = request.session.get('failed_login_attempts', 0)
+    last_failed_attempt = request.session.get('last_failed_attempt', 0)
+
+    # Brute-force throttling: 30-second lockout after 5 consecutive failures
+    if failed_attempts >= 5 and (time.time() - last_failed_attempt < 30):
+        remaining = int(30 - (time.time() - last_failed_attempt))
+        messages.error(request, f'Too many failed attempts. Please wait {remaining}s before trying again.')
+        return render(request, 'dashboard/login.html')
+
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            request.session['failed_login_attempts'] = 0
             login(request, user)
             return redirect('dashboard')
         else:
+            request.session['failed_login_attempts'] = failed_attempts + 1
+            request.session['last_failed_attempt'] = time.time()
             messages.error(request, 'Invalid username or password')
     return render(request, 'dashboard/login.html')
 

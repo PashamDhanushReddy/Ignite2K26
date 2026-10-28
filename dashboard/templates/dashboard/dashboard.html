@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ignite Admin Dashboard</title>
+    <title>Ignite-2K27 Admin Dashboard</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -832,7 +832,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand animate__animated animate__fadeInLeft" href="{% url 'dashboard' %}">
-                <i class="fas fa-code me-2"></i>Ignite 2026 Admin
+                <i class="fas fa-code me-2"></i>Ignite-2K27 Admin
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -1775,6 +1775,47 @@
                 });
             });
         });
+    </script>
+
+    <!-- Security: Disable Right Click & Developer Inspection Shortcuts -->
+    <script>
+        (function () {
+            // Disable right click context menu
+            document.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Disable developer tool shortcuts
+            document.addEventListener('keydown', function (e) {
+                // F12
+                if (e.keyCode === 123 || e.key === 'F12') {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Inspect/Console)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (View Source)
+                if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+S (Save Page)
+                if (e.ctrlKey && (e.key === 'S' || e.key === 's')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Disable dragstart on sensitive elements
+            document.addEventListener('dragstart', function (e) {
+                e.preventDefault();
+                return false;
+            });
+        })();
     </script>
 </body>
 

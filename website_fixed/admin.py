@@ -1,6 +1,10 @@
 from django.contrib import admin
 from .models import WebRegistration, WebTeammember
 
+admin.site.site_header = "Ignite-2K27 Admin Portal"
+admin.site.site_title = "Ignite-2K27 Admin"
+admin.site.index_title = "Welcome to Ignite-2K27 Administration"
+
 class WebTeammemberInline(admin.TabularInline):
     model = WebTeammember
     extra = 0
