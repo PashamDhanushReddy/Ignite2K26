@@ -200,17 +200,27 @@
         <section
             class="max-w-7xl mx-auto px-4 md:px-8 pt-4 sm:pt-6 md:pt-10 pb-12 md:pb-20 relative overflow-hidden lg:overflow-visible">
 
-            <!-- Mobile Background Layer (Static ambient background image behind hero text on mobile, hidden on desktop) -->
+            <!-- Mobile & Tablet Background Video Layer (Plays video on mobile & tablet; fallback poster if unable to play) -->
             <div
                 class="absolute inset-0 -z-10 pointer-events-none lg:hidden flex items-center justify-center overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/60 z-10">
                 </div>
 
-                <!-- Static Background Image for Mobile: Always hero_poster.png -->
+                <!-- Fallback Background Image for Mobile/Tablet -->
                 <img id="mobileHeroBgImg" src="{% static 'web/images/hero_poster.png' %}"
                     alt="Ignite 2K27 Expo Background"
-                    class="w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md"
+                    class="w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md transition-opacity duration-700"
                     aria-hidden="true">
+
+                <!-- Background Video for Mobile & Tablet -->
+                <video id="mobileHeroBgVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
+                    preload="auto" disablepictureinpicture disableremoteplayback
+                    poster="{% static 'web/images/hero_poster.png' %}"
+                    class="absolute inset-0 m-auto w-full h-full max-w-xl object-contain object-center scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md transition-opacity duration-700 opacity-0"
+                    aria-hidden="true">
+                    <source src="{% static 'web/images/bg_video.mp4' %}" type="video/mp4">
+                    <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
+                </video>
             </div>
 
             <div
@@ -1131,101 +1141,96 @@
                 setTimeout(runTypewriter, 2000);
             }
             // Universal Cross-Device Hero Video Engine (Desktop, Tablet, Mobile)
-            const heroVid = document.getElementById('heroVideo');
-            const heroImg = document.getElementById('heroImage');
+            function initHeroVideoPair(vidId, imgId) {
+                const vid = document.getElementById(vidId);
+                const img = document.getElementById(imgId);
+                if (!vid) return;
 
-            if (heroVid && heroImg) {
-                // Guarantee muted & inline playback attributes across all mobile browsers
-                heroVid.muted = true;
-                heroVid.defaultMuted = true;
-                heroVid.playsInline = true;
-                heroVid.setAttribute('muted', '');
-                heroVid.setAttribute('playsinline', '');
-                heroVid.setAttribute('webkit-playsinline', '');
-                heroVid.setAttribute('x5-playsinline', '');
+                vid.muted = true;
+                vid.defaultMuted = true;
+                vid.playsInline = true;
+                vid.setAttribute('muted', '');
+                vid.setAttribute('playsinline', '');
+                vid.setAttribute('webkit-playsinline', '');
+                vid.setAttribute('x5-playsinline', '');
 
-                let isVideoRevealed = false;
+                let isPlaying = false;
 
-                function revealVideo() {
-                    if (isVideoRevealed) return;
-                    isVideoRevealed = true;
-                    // Smoothly fade in the video over the fallback poster
+                function onVideoActive() {
+                    if (isPlaying) return;
+                    isPlaying = true;
                     requestAnimationFrame(() => {
-                        heroVid.classList.remove('opacity-0');
-                        heroVid.classList.add('opacity-100');
+                        vid.classList.remove('opacity-0');
+                        vid.classList.add('opacity-100');
                         setTimeout(() => {
-                            if (isVideoRevealed && heroImg) {
-                                heroImg.classList.add('opacity-0');
+                            if (isPlaying && img) {
+                                img.classList.add('opacity-0');
                             }
                         }, 600);
                     });
                 }
 
-                function keepFallbackPoster() {
-                    isVideoRevealed = false;
-                    heroVid.classList.remove('opacity-100');
-                    heroVid.classList.add('opacity-0');
-                    if (heroImg) {
-                        heroImg.classList.remove('opacity-0');
+                function onVideoFallback() {
+                    isPlaying = false;
+                    vid.classList.remove('opacity-100');
+                    vid.classList.add('opacity-0');
+                    if (img) {
+                        img.classList.remove('opacity-0');
                     }
                 }
 
-                // Smoothly reveal video as soon as active frames are rendering
-                heroVid.addEventListener('playing', revealVideo);
-                heroVid.addEventListener('timeupdate', function onTime() {
-                    if (heroVid.currentTime > 0.05) {
-                        revealVideo();
-                        heroVid.removeEventListener('timeupdate', onTime);
+                vid.addEventListener('playing', onVideoActive);
+                vid.addEventListener('timeupdate', function onTime() {
+                    if (vid.currentTime > 0.05) {
+                        onVideoActive();
+                        vid.removeEventListener('timeupdate', onTime);
                     }
                 });
 
-                // If video fails to load or play, keep fallback poster visible
-                heroVid.addEventListener('error', keepFallbackPoster, true);
+                vid.addEventListener('error', onVideoFallback, true);
 
-                function attemptPlayback() {
-                    heroVid.muted = true;
-                    const playPromise = heroVid.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            revealVideo();
+                function attemptPlay() {
+                    vid.muted = true;
+                    const p = vid.play();
+                    if (p !== undefined) {
+                        p.then(() => {
+                            onVideoActive();
                         }).catch(() => {
-                            // Autoplay blocked by mobile battery saver / low-power mode or gesture policy.
-                            // The fallback poster remains visible. Trigger play on the first touch or scroll!
-                            const onUserInteraction = function() {
-                                heroVid.muted = true;
-                                heroVid.play().then(() => {
-                                    revealVideo();
-                                    removeInteractionListeners();
+                            const onGesture = function() {
+                                vid.muted = true;
+                                vid.play().then(() => {
+                                    onVideoActive();
+                                    removeGestureListeners();
                                 }).catch(() => {});
                             };
-
-                            const removeInteractionListeners = function() {
+                            const removeGestureListeners = function() {
                                 ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
-                                    window.removeEventListener(evt, onUserInteraction);
+                                    window.removeEventListener(evt, onGesture);
                                 });
                             };
-
                             ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
-                                window.addEventListener(evt, onUserInteraction, { passive: true, once: true });
+                                window.addEventListener(evt, onGesture, { passive: true, once: true });
                             });
                         });
                     }
                 }
 
-                // If mobile WebKit didn't auto-resolve sources, set direct src
-                if (!heroVid.currentSrc && !heroVid.src) {
-                    heroVid.src = "{% static 'web/images/bg_video.mp4' %}";
+                if (!vid.currentSrc && !vid.src) {
+                    vid.src = "{% static 'web/images/bg_video.mp4' %}";
                 }
 
-                if (heroVid.readyState >= 2) {
-                    attemptPlayback();
+                if (vid.readyState >= 2) {
+                    attemptPlay();
                 } else {
-                    heroVid.addEventListener('canplay', attemptPlayback, { once: true });
-                    heroVid.addEventListener('loadeddata', attemptPlayback, { once: true });
-                    heroVid.load();
+                    vid.addEventListener('canplay', attemptPlay, { once: true });
+                    vid.addEventListener('loadeddata', attemptPlay, { once: true });
+                    vid.load();
                 }
-                attemptPlayback();
+                attemptPlay();
             }
+
+            initHeroVideoPair('mobileHeroBgVideo', 'mobileHeroBgImg');
+            initHeroVideoPair('heroVideo', 'heroImage');
 
         });
     </script>
