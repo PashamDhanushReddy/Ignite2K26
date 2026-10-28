@@ -216,7 +216,7 @@
                 <video id="mobileHeroBgVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
                     preload="auto" disablepictureinpicture disableremoteplayback
                     poster="{% static 'web/images/hero_poster.png' %}"
-                    class="absolute inset-0 m-auto w-full h-full max-w-xl object-contain object-center scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md transition-opacity duration-700 opacity-0"
+                    class="absolute inset-0 m-auto w-full h-full max-w-xl md:max-w-2xl object-contain object-center scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md opacity-90 transition-opacity duration-700"
                     aria-hidden="true">
                     <source src="{% static 'web/images/bg_video.mp4' %}" type="video/mp4">
                     <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
@@ -1146,6 +1146,7 @@
                 const img = document.getElementById(imgId);
                 if (!vid) return;
 
+                // iOS & Android require explicit muted and playsinline properties
                 vid.muted = true;
                 vid.defaultMuted = true;
                 vid.playsInline = true;
@@ -1154,69 +1155,51 @@
                 vid.setAttribute('webkit-playsinline', '');
                 vid.setAttribute('x5-playsinline', '');
 
-                let isPlaying = false;
-
-                function onVideoActive() {
-                    if (isPlaying) return;
-                    isPlaying = true;
-                    requestAnimationFrame(() => {
-                        vid.classList.remove('opacity-0');
-                        vid.classList.add('opacity-100');
+                function onActive() {
+                    vid.classList.remove('opacity-0');
+                    if (img) {
                         setTimeout(() => {
-                            if (isPlaying && img) {
+                            if (!vid.paused && vid.currentTime > 0) {
                                 img.classList.add('opacity-0');
                             }
-                        }, 600);
-                    });
-                }
-
-                function onVideoFallback() {
-                    isPlaying = false;
-                    vid.classList.remove('opacity-100');
-                    vid.classList.add('opacity-0');
-                    if (img) {
-                        img.classList.remove('opacity-0');
+                        }, 500);
                     }
                 }
 
-                vid.addEventListener('playing', onVideoActive);
-                vid.addEventListener('timeupdate', function onTime() {
-                    if (vid.currentTime > 0.05) {
-                        onVideoActive();
-                        vid.removeEventListener('timeupdate', onTime);
+                vid.addEventListener('playing', onActive);
+                vid.addEventListener('timeupdate', () => {
+                    if (vid.currentTime > 0.01) {
+                        onActive();
                     }
                 });
-
-                vid.addEventListener('error', onVideoFallback, true);
 
                 function attemptPlay() {
                     vid.muted = true;
                     const p = vid.play();
                     if (p !== undefined) {
                         p.then(() => {
-                            onVideoActive();
+                            onActive();
                         }).catch(() => {
-                            const onGesture = function() {
+                            // Autoplay blocked by mobile battery-saver or policy:
+                            // Poster image is already displaying as fallback.
+                            // Trigger instant playback on user's first touch or scroll!
+                            const unlock = () => {
                                 vid.muted = true;
                                 vid.play().then(() => {
-                                    onVideoActive();
-                                    removeGestureListeners();
+                                    onActive();
+                                    removeUnlockListeners();
                                 }).catch(() => {});
                             };
-                            const removeGestureListeners = function() {
+                            const removeUnlockListeners = () => {
                                 ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
-                                    window.removeEventListener(evt, onGesture);
+                                    window.removeEventListener(evt, unlock);
                                 });
                             };
                             ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
-                                window.addEventListener(evt, onGesture, { passive: true, once: true });
+                                window.addEventListener(evt, unlock, { passive: true, once: true });
                             });
                         });
                     }
-                }
-
-                if (!vid.currentSrc && !vid.src) {
-                    vid.src = "{% static 'web/images/bg_video.mp4' %}";
                 }
 
                 if (vid.readyState >= 2) {
@@ -1224,7 +1207,6 @@
                 } else {
                     vid.addEventListener('canplay', attemptPlay, { once: true });
                     vid.addEventListener('loadeddata', attemptPlay, { once: true });
-                    vid.load();
                 }
                 attemptPlay();
             }
