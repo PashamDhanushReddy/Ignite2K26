@@ -160,8 +160,8 @@
                 {% if messages %}
                 <div class="mb-8 space-y-3">
                     {% for message in messages %}
-                    <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 flex items-center gap-3 text-sm font-semibold shadow-sm">
-                        <i class="ri-error-warning-line text-lg text-rose-600"></i>
+                    <div class="p-4 {% if message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800{% elif message.tags == 'warning' %}bg-amber-50 border-amber-200 text-amber-800{% else %}bg-rose-50 border-rose-200 text-rose-800{% endif %} border rounded-2xl flex items-center gap-3 text-sm font-semibold shadow-sm">
+                        <i class="{% if message.tags == 'success' %}ri-checkbox-circle-line text-emerald-600{% elif message.tags == 'warning' %}ri-alert-line text-amber-600{% else %}ri-error-warning-line text-rose-600{% endif %} text-lg flex-shrink-0"></i>
                         <span>{{ message }}</span>
                     </div>
                     {% endfor %}
@@ -170,6 +170,12 @@
 
                 <form method="POST" enctype="multipart/form-data" id="regForm" class="space-y-10">
                     {% csrf_token %}
+
+                    <!-- Anti-bot Security Honeypot -->
+                    <div style="position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
+                        <label for="website_hp">Security Check (Leave Blank)</label>
+                        <input type="text" id="website_hp" name="website_hp" tabindex="-1" autocomplete="off">
+                    </div>
 
                     <div class="space-y-6">
                         <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
@@ -352,10 +358,10 @@
                     </div>
 
                     <div class="pt-6">
-                        <button type="submit"
+                        <button type="submit" id="submitBtn"
                             class="w-full py-4 rounded-full bg-slate-950 text-white font-extrabold text-sm sm:text-base uppercase tracking-wider hover:bg-slate-800 shadow-pill hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
-                            <span>Submit & Confirm Team Registration</span>
-                            <i class="ri-arrow-right-line"></i>
+                            <span id="submitBtnText">Submit & Confirm Team Registration</span>
+                            <i class="ri-arrow-right-line" id="submitBtnIcon"></i>
                         </button>
                     </div>
                 </form>
@@ -605,7 +611,48 @@
             updatePaymentFee();
         }
         generateTeamMembers();
+
+        // Form Submit handler: Prevent duplicate submissions and show loading state
+        const regForm = document.getElementById('regForm');
+        if (regForm) {
+            regForm.addEventListener('submit', function(e) {
+                const docInput = document.querySelector('input[name="project_document"]');
+                if (docInput && docInput.files && docInput.files[0]) {
+                    const fileSize = docInput.files[0].size;
+                    if (fileSize > 10 * 1024 * 1024) {
+                        e.preventDefault();
+                        alert('Project document must be less than 10MB.');
+                        return false;
+                    }
+                }
+
+                const screenInput = document.getElementById('screenshotInput');
+                if (screenInput && screenInput.files && screenInput.files[0]) {
+                    const fileSize = screenInput.files[0].size;
+                    if (fileSize > 5 * 1024 * 1024) {
+                        e.preventDefault();
+                        alert('Payment screenshot must be less than 5MB.');
+                        return false;
+                    }
+                }
+
+                const btn = document.getElementById('submitBtn');
+                const btnText = document.getElementById('submitBtnText');
+                const btnIcon = document.getElementById('submitBtnIcon');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-80', 'cursor-not-allowed');
+                    if (btnText) btnText.textContent = 'Submitting & Validating...';
+                    if (btnIcon) {
+                        btnIcon.className = 'ri-loader-4-line animate-spin text-lg';
+                    }
+                }
+            });
+        }
     </script>
+
+    <!-- Website Security (Right-Click & DevTools Protection) -->
+    <script src="{% static 'web/js/security.js' %}"></script>
 
     <!-- QR Modal Lightbox -->
     <div id="qrModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 transition-all" onclick="closeQrModal()">

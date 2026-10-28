@@ -19,107 +19,234 @@ def index(request):
     ]
     return render(request, 'web/index.html', {'domains': domains})
 
+import re
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
+ALLOWED_DOC_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx'}
+ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
+MAX_DOC_SIZE = 10 * 1024 * 1024   # 10 MB
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+VALID_DEPARTMENTS = {'CSE', 'AIML', 'CSE-CS', 'CSE-DS', 'IT', 'ECE', 'EEE', 'MECH', 'CIVIL'}
+VALID_TSHIRTS = {'S', 'M', 'L', 'XL', 'XXL', 'XXXL'}
+VALID_FOODS = {'VEG', 'NON-VEG'}
+
 def register(request):
     if request.method == 'POST':
         try:
-            with transaction.atomic():
-                project_title = request.POST.get('project_title')
-                
-                try:
-                    team_size = int(request.POST.get('team_size', 2))
-                except ValueError:
-                    team_size = 2
-                
-                leader_name = request.POST.get('member_name_1')
-                leader_email = request.POST.get('member_email_1')
-                leader_mobile = request.POST.get('member_mobile_1')
-                
-                if team_size < 2: team_size = 2
-                if team_size > 6: team_size = 6
+            # 1. Anti-spam honeypot detection
+            if request.POST.get('website_hp'):
+                messages.error(request, "Registration request rejected due to suspicious activity.")
+                return render(request, 'web/register.html')
 
-                college_sel = request.POST.get('college_selection')
-                college_other = request.POST.get('college_name_other') if college_sel == 'OTHER' else None
-                
-                trans_id = request.POST.get('transaction_id')
-                
-                if Registration.objects.filter(project_title=project_title).exists():
-                    messages.error(request, "Project Title already exists.")
+            # 2. Project Title validation
+            project_title = (request.POST.get('project_title') or '').strip()
+            if not project_title or len(project_title) < 3:
+                messages.error(request, "Please enter a valid Project Title (at least 3 characters).")
+                return render(request, 'web/register.html')
+
+            if len(project_title) > 255:
+                messages.error(request, "Project Title must be 255 characters or fewer.")
+                return render(request, 'web/register.html')
+
+            if Registration.objects.filter(project_title__iexact=project_title).exists():
+                messages.error(request, f"A project with the title '{project_title}' has already been registered.")
+                return render(request, 'web/register.html')
+
+            # 3. Team size validation
+            try:
+                team_size = int(request.POST.get('team_size', 2))
+                if team_size < 2 or team_size > 6:
+                    messages.error(request, "Team size must be between 2 and 6 members.")
                     return render(request, 'web/register.html')
-                
-                if college_sel == 'OTHER':
-                    if not trans_id or not request.FILES.get('payment_screenshot'):
-                        messages.error(request, "Payment details are required for non-NRCM students.")
-                        return render(request, 'web/register.html')
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid team size specified.")
+                return render(request, 'web/register.html')
 
-                    if Registration.objects.filter(transaction_id=trans_id).exists():
-                        messages.error(request, "Transaction ID already used.")
-                        return render(request, 'web/register.html')
-                else:
-                    if not trans_id:
-                        trans_id = None 
+            # 4. College Selection & Payment details validation
+            college_sel = request.POST.get('college_selection', 'NRCM')
+            if college_sel not in ('NRCM', 'OTHER'):
+                college_sel = 'NRCM'
 
+            college_other = None
+            trans_id = (request.POST.get('transaction_id') or '').strip() or None
+            payment_screenshot = request.FILES.get('payment_screenshot')
+
+            if college_sel == 'OTHER':
+                college_other = (request.POST.get('college_name_other') or '').strip()
+                if not college_other or len(college_other) < 2:
+                    messages.error(request, "Please specify your Institution / College name.")
+                    return render(request, 'web/register.html')
+
+                if not trans_id:
+                    messages.error(request, "Transaction / UTR ID is required for non-NRCM college registrations.")
+                    return render(request, 'web/register.html')
+
+                if not payment_screenshot:
+                    messages.error(request, "Payment screenshot is required for non-NRCM college registrations.")
+                    return render(request, 'web/register.html')
+
+            if trans_id:
+                if Registration.objects.filter(transaction_id__iexact=trans_id).exists():
+                    messages.error(request, f"The Transaction / UTR ID '{trans_id}' has already been used.")
+                    return render(request, 'web/register.html')
+
+            # 5. File upload validation (Screenshots)
+            if payment_screenshot:
+                if payment_screenshot.size > MAX_IMAGE_SIZE:
+                    messages.error(request, "Payment screenshot file size must be under 5MB.")
+                    return render(request, 'web/register.html')
+                img_ext = os.path.splitext(payment_screenshot.name)[1].lower().lstrip('.')
+                if img_ext not in ALLOWED_IMAGE_EXTENSIONS:
+                    messages.error(request, f"Invalid payment screenshot format (.{img_ext}). Allowed formats: JPG, JPEG, PNG, WEBP.")
+                    return render(request, 'web/register.html')
+
+            # 6. File upload validation (Project Document / Abstract)
+            project_doc = request.FILES.get('project_document')
+            if not project_doc:
+                messages.error(request, "Project abstract / presentation document is required.")
+                return render(request, 'web/register.html')
+
+            if project_doc.size > MAX_DOC_SIZE:
+                messages.error(request, "Project document file size must be under 10MB.")
+                return render(request, 'web/register.html')
+
+            doc_ext = os.path.splitext(project_doc.name)[1].lower().lstrip('.')
+            if doc_ext not in ALLOWED_DOC_EXTENSIONS:
+                messages.error(request, f"Invalid project document format (.{doc_ext}). Allowed formats: PDF, DOC, DOCX, PPT, PPTX.")
+                return render(request, 'web/register.html')
+
+            # 7. Team Members validation
+            mobile_regex = re.compile(r'^[6-9]\d{9}$')
+            members_data = []
+            seen_roll_numbers = set()
+            seen_emails = set()
+            seen_mobiles = set()
+
+            for i in range(1, team_size + 1):
+                name = (request.POST.get(f'member_name_{i}') or '').strip()
+                email = (request.POST.get(f'member_email_{i}') or '').strip().lower()
+                mobile = (request.POST.get(f'member_mobile_{i}') or '').strip()
+                roll = (request.POST.get(f'member_roll_{i}') or '').strip().upper()
+                dept = (request.POST.get(f'member_dept_{i}') or '').strip().upper()
+                tshirt = (request.POST.get(f'member_tshirt_{i}') or 'M').strip().upper()
+                food = (request.POST.get(f'member_food_{i}') or 'VEG').strip().upper()
+
+                label = f"Team Leader (Member 1)" if i == 1 else f"Member {i}"
+
+                if not name or len(name) < 2:
+                    messages.error(request, f"Please enter a valid full name for {label}.")
+                    return render(request, 'web/register.html')
+
+                if not email:
+                    messages.error(request, f"Email ID is required for {label}.")
+                    return render(request, 'web/register.html')
+                try:
+                    validate_email(email)
+                except ValidationError:
+                    messages.error(request, f"Invalid email ID '{email}' entered for {label}.")
+                    return render(request, 'web/register.html')
+
+                if email in seen_emails:
+                    messages.error(request, f"Duplicate email '{email}' found for multiple team members.")
+                    return render(request, 'web/register.html')
+                seen_emails.add(email)
+
+                if not mobile or not mobile_regex.match(mobile):
+                    messages.error(request, f"Invalid mobile number for {label}. Must be a 10-digit number starting with 6-9.")
+                    return render(request, 'web/register.html')
+
+                if mobile in seen_mobiles:
+                    messages.error(request, f"Duplicate mobile '{mobile}' found for multiple team members.")
+                    return render(request, 'web/register.html')
+                seen_mobiles.add(mobile)
+
+                if not roll:
+                    messages.error(request, f"Hall ticket / Roll number is required for {label}.")
+                    return render(request, 'web/register.html')
+
+                if roll in seen_roll_numbers:
+                    messages.error(request, f"Duplicate roll number '{roll}' found in team members.")
+                    return render(request, 'web/register.html')
+                seen_roll_numbers.add(roll)
+
+                if dept not in VALID_DEPARTMENTS:
+                    messages.error(request, f"Please select a valid department for {label}.")
+                    return render(request, 'web/register.html')
+
+                if tshirt not in VALID_TSHIRTS:
+                    tshirt = 'M'
+                if food not in VALID_FOODS:
+                    food = 'VEG'
+
+                members_data.append({
+                    'name': name,
+                    'email': email,
+                    'mobile': mobile,
+                    'roll_no': roll,
+                    'department': dept,
+                    'tshirt_size': tshirt,
+                    'food_preference': food,
+                })
+
+            # 8. Create Registration and Team Members in Atomic Transaction
+            with transaction.atomic():
                 reg = Registration.objects.create(
                     project_title=project_title,
-                    team_leader_name=leader_name,
-                    team_leader_email=leader_email,
-                    team_leader_mobile=leader_mobile,
+                    team_leader_name=members_data[0]['name'],
+                    team_leader_email=members_data[0]['email'],
+                    team_leader_mobile=members_data[0]['mobile'],
                     team_size=team_size,
                     college_selection=college_sel,
                     college_name_other=college_other,
                     transaction_id=trans_id,
-                    payment_screenshot=request.FILES.get('payment_screenshot') if college_sel == 'OTHER' else None,
-                    project_document=request.FILES.get('project_document')
+                    payment_screenshot=payment_screenshot if college_sel == 'OTHER' else None,
+                    project_document=project_doc,
+                    project_category=members_data[0]['department']
                 )
 
-                first_dept = None
-                for i in range(1, team_size + 1):
-                    name = request.POST.get(f'member_name_{i}')
-                    email = request.POST.get(f'member_email_{i}')
-                    mobile = request.POST.get(f'member_mobile_{i}')
-                    roll = request.POST.get(f'member_roll_{i}')
-                    dept = request.POST.get(f'member_dept_{i}')
-                    if i == 1:
-                        first_dept = dept
-                    tshirt = request.POST.get(f'member_tshirt_{i}')
-                    food = request.POST.get(f'member_food_{i}')
-                    
-                    TeamMember.objects.create(
+                created_members = []
+                for m in members_data:
+                    tm = TeamMember.objects.create(
                         registration=reg,
-                        name=name,
-                        email=email,
-                        mobile=mobile,
-                        roll_no=roll,
-                        department=dept,
-                        tshirt_size=tshirt,
-                        food_preference=food
+                        name=m['name'],
+                        email=m['email'],
+                        mobile=m['mobile'],
+                        roll_no=m['roll_no'],
+                        department=m['department'],
+                        tshirt_size=m['tshirt_size'],
+                        food_preference=m['food_preference']
                     )
+                    created_members.append(tm)
 
-                if first_dept and not reg.project_category:
-                    reg.project_category = first_dept
-                    reg.save(update_fields=['project_category'])
-
-                request.session['registration_id'] = reg.id
-                messages.success(request, "Registration successful! Good luck for Ignite 2K27.")
-
-                members = list(TeamMember.objects.filter(registration=reg))
                 college_name = 'Narsimha Reddy Engineering College (NRCM)'
                 if reg.college_selection == 'OTHER' and reg.college_name_other:
                     college_name = reg.college_name_other
 
-                thread = threading.Thread(
+                # GUARANTEE: Email is dispatched ONLY IF the database transaction successfully commits!
+                transaction.on_commit(lambda: threading.Thread(
                     target=send_registration_email,
-                    args=(reg, members, college_name),
+                    args=(reg, created_members, college_name),
                     daemon=False
-                )
-                thread.start()
+                ).start())
 
-                return redirect('success')
+            # Store successful registration ID in session
+            request.session['registration_id'] = reg.id
+            messages.success(request, "Registration successful! Good luck for Ignite 2K27.")
+            return redirect('success')
 
+        except IntegrityError as ie:
+            request.session.pop('registration_id', None)
+            messages.error(request, "A database conflict occurred (e.g. duplicate title or transaction ID). Please check your details and try again.")
+            return render(request, 'web/register.html')
         except Exception as e:
-            messages.error(request, f"An error occurred: {str(e)}")
+            request.session.pop('registration_id', None)
+            messages.error(request, f"Registration could not be completed: {str(e)}")
             return render(request, 'web/register.html')
 
     return render(request, 'web/register.html')
+
 
 
 def send_registration_email(reg, members, college_name):
@@ -287,64 +414,69 @@ def send_registration_email(reg, members, college_name):
         print(f"[Ignite Email] Failed to send confirmation email via SMTP: {e}", flush=True)
 
 
-def get_registration_context(request):
-    reg = None
+def get_registration_context(reg):
+    college = 'Narsimha Reddy Engineering College (NRCM)'
+    if reg.college_selection == 'OTHER' and reg.college_name_other:
+        college = reg.college_name_other
+    elif reg.college_selection == 'NRCM':
+        college = 'Narsimha Reddy Engineering College (NRCM)'
+
+    trans_id = reg.transaction_id if reg.transaction_id else (
+        'Recorded (NRCM Student)' if reg.college_selection == 'NRCM' else 'Recorded'
+    )
+
+    return {
+        'registration': reg,
+        'team_name': reg.project_title,
+        'project_title': reg.project_title,
+        'team_size': reg.team_size,
+        'team_leader_name': reg.team_leader_name,
+        'theme': reg.project_category or 'Engineering Expo',
+        'transaction_id': trans_id,
+        'college': college,
+        'members': list(reg.team_members.all()),
+        'whatsapp_link': 'https://chat.whatsapp.com/DjPvw8V5RANCUzECRVVt80',
+    }
+
+def get_verified_registration(request):
+    reg_id = request.session.get('registration_id')
+    if not reg_id:
+        return None
     try:
         from django.db import connection
         if connection.connection and connection.connection.closed:
             connection.connect()
-        reg_id = request.session.get('registration_id')
-        if reg_id:
-            reg = Registration.objects.filter(id=reg_id).first()
-        if not reg:
-            reg = Registration.objects.order_by('-created_at').first()
+        return Registration.objects.prefetch_related('team_members').filter(id=reg_id).first()
     except Exception:
         try:
             from django.db import connection
             connection.close()
-            reg_id = request.session.get('registration_id')
-            if reg_id:
-                reg = Registration.objects.filter(id=reg_id).first()
-            if not reg:
-                reg = Registration.objects.order_by('-created_at').first()
+            return Registration.objects.prefetch_related('team_members').filter(id=reg_id).first()
         except Exception:
-            reg = None
-
-    college = 'Narsimha Reddy Engineering College'
-    if reg:
-        if reg.college_selection == 'OTHER' and reg.college_name_other:
-            college = reg.college_name_other
-        elif reg.college_selection == 'NRCM':
-            college = 'Narsimha Reddy Engineering College (NRCM)'
-
-    project_title = reg.project_title if reg else 'Smart Project Team'
-    team_size = reg.team_size if reg else 2
-    team_leader = reg.team_leader_name if reg else 'Team Lead'
-    theme = reg.project_category if (reg and reg.project_category) else 'Engineering Expo'
-    trans_id = reg.transaction_id if (reg and reg.transaction_id) else ('Recorded (NRCM Student)' if (reg and reg.college_selection == 'NRCM') else 'Recorded')
-
-    return {
-        'registration': reg,
-        'team_name': project_title,
-        'project_title': project_title,
-        'team_size': team_size,
-        'team_leader_name': team_leader,
-        'theme': theme,
-        'transaction_id': trans_id,
-        'college': college,
-        'whatsapp_link': 'https://chat.whatsapp.com/DjPvw8V5RANCUzECRVVt80',
-    }
+            return None
 
 def success(request):
-    context = get_registration_context(request)
+    reg = get_verified_registration(request)
+    if not reg:
+        messages.error(request, "Access restricted: You must complete a successful registration to view this page.")
+        return redirect('register')
+    context = get_registration_context(reg)
     return render(request, 'web/registration_success.html', context)
 
 def receipt(request):
-    context = get_registration_context(request)
+    reg = get_verified_registration(request)
+    if not reg:
+        messages.error(request, "Access restricted: You must complete a successful registration to access your receipt.")
+        return redirect('register')
+    context = get_registration_context(reg)
     return render(request, 'web/registration_receipt.html', context)
 
 def pdf_receipt(request):
-    context = get_registration_context(request)
+    reg = get_verified_registration(request)
+    if not reg:
+        messages.error(request, "Access restricted: You must complete a successful registration to access your PDF receipt.")
+        return redirect('register')
+    context = get_registration_context(reg)
     return render(request, 'web/pdf_receipt.html', context)
 
 from django.http import JsonResponse
