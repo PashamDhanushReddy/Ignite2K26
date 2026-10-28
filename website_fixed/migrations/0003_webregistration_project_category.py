@@ -3,6 +3,19 @@
 from django.db import migrations, models
 
 
+def add_project_category_if_not_exists(apps, schema_editor):
+    connection = schema_editor.connection
+    table_name = 'web_registration'
+    column_name = 'project_category'
+    with connection.cursor() as cursor:
+        columns = [col.name for col in connection.introspection.get_table_description(cursor, table_name)]
+        if column_name not in columns:
+            if connection.vendor == 'postgresql':
+                cursor.execute(f'ALTER TABLE "{table_name}" ADD COLUMN IF NOT EXISTS "{column_name}" varchar(255) NULL;')
+            else:
+                cursor.execute(f'ALTER TABLE "{table_name}" ADD COLUMN "{column_name}" varchar(255) NULL;')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,9 +23,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='webregistration',
-            name='project_category',
-            field=models.CharField(blank=True, max_length=255, null=True),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.AddField(
+                    model_name='webregistration',
+                    name='project_category',
+                    field=models.CharField(blank=True, max_length=255, null=True),
+                ),
+            ],
+            database_operations=[
+                migrations.RunPython(
+                    add_project_category_if_not_exists,
+                    reverse_code=migrations.RunPython.noop,
+                ),
+            ],
         ),
     ]
