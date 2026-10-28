@@ -388,10 +388,10 @@
                             <video id="heroVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
                                 preload="auto" disablepictureinpicture disableremoteplayback
                                 poster="{% static 'web/images/hero_poster.png' %}"
-                                class="hidden absolute inset-0 m-auto w-full h-full max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-opacity duration-700 opacity-0 pointer-events-none hover:scale-[1.12]"
+                                class="absolute inset-0 m-auto w-full h-full max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-opacity duration-700 opacity-0 pointer-events-none hover:scale-[1.12]"
                                 aria-label="Ignite 2K27 Student Innovation and Robotics Showcase">
-                                <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
                                 <source src="{% static 'web/images/bg_video.mp4' %}" type="video/mp4">
+                                <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
                             </video>
                         </div>
 
@@ -1131,8 +1131,6 @@
                 setTimeout(runTypewriter, 2000);
             }
             // Universal Cross-Device Hero Video Engine (Desktop, Tablet, Mobile)
-            // Displays fallback poster immediately on slow connections, then smoothly crossfades
-            // into the animated video as soon as frames begin rendering.
             const heroVid = document.getElementById('heroVideo');
             const heroImg = document.getElementById('heroImage');
 
@@ -1151,8 +1149,7 @@
                 function revealVideo() {
                     if (isVideoRevealed) return;
                     isVideoRevealed = true;
-                    // Unhide and smoothly transition opacity over the fallback poster
-                    heroVid.classList.remove('hidden');
+                    // Smoothly fade in the video over the fallback poster
                     requestAnimationFrame(() => {
                         heroVid.classList.remove('opacity-0');
                         heroVid.classList.add('opacity-100');
@@ -1160,7 +1157,7 @@
                             if (isVideoRevealed && heroImg) {
                                 heroImg.classList.add('opacity-0');
                             }
-                        }, 700);
+                        }, 600);
                     });
                 }
 
@@ -1168,12 +1165,8 @@
                     isVideoRevealed = false;
                     heroVid.classList.remove('opacity-100');
                     heroVid.classList.add('opacity-0');
-                    setTimeout(() => {
-                        if (!isVideoRevealed) heroVid.classList.add('hidden');
-                    }, 500);
                     if (heroImg) {
                         heroImg.classList.remove('opacity-0');
-                        heroImg.classList.remove('hidden');
                     }
                 }
 
@@ -1186,7 +1179,7 @@
                     }
                 });
 
-                // If video fails to load or play on the network, keep the fallback poster visible
+                // If video fails to load or play, keep fallback poster visible
                 heroVid.addEventListener('error', keepFallbackPoster, true);
 
                 function attemptPlayback() {
@@ -1194,7 +1187,7 @@
                     const playPromise = heroVid.play();
                     if (playPromise !== undefined) {
                         playPromise.then(() => {
-                            // Autoplay successful
+                            revealVideo();
                         }).catch(() => {
                             // Autoplay blocked by mobile battery saver / low-power mode or gesture policy.
                             // The fallback poster remains visible. Trigger play on the first touch or scroll!
@@ -1207,23 +1200,28 @@
                             };
 
                             const removeInteractionListeners = function() {
-                                ['touchstart', 'touchend', 'scroll', 'click'].forEach(evt => {
+                                ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
                                     window.removeEventListener(evt, onUserInteraction);
                                 });
                             };
 
-                            ['touchstart', 'touchend', 'scroll', 'click'].forEach(evt => {
+                            ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
                                 window.addEventListener(evt, onUserInteraction, { passive: true, once: true });
                             });
                         });
                     }
                 }
 
-                // If already buffered enough, play now; otherwise start buffering and play when ready
+                // If mobile WebKit didn't auto-resolve sources, set direct src
+                if (!heroVid.currentSrc && !heroVid.src) {
+                    heroVid.src = "{% static 'web/images/bg_video.mp4' %}";
+                }
+
                 if (heroVid.readyState >= 2) {
                     attemptPlayback();
                 } else {
                     heroVid.addEventListener('canplay', attemptPlayback, { once: true });
+                    heroVid.addEventListener('loadeddata', attemptPlayback, { once: true });
                     heroVid.load();
                 }
                 attemptPlayback();
