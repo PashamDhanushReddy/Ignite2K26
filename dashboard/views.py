@@ -12,7 +12,8 @@ from datetime import datetime
 import openpyxl
 from io import BytesIO
 from django.utils.dateparse import parse_datetime
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.db.models.functions import TruncDate
 
 # Import models
 from website_fixed.models import WebRegistration, WebTeammember
@@ -248,8 +249,22 @@ def dashboard_view(request):
 
     total_registrations = WebRegistration.objects.count()
     
+    # Calculate daily registration counts for chart
+    daily_qs = (
+        registrations_qs
+        .filter(created_at__isnull=False)
+        .annotate(date=TruncDate('created_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+    daily_labels = [entry['date'].strftime('%Y-%m-%d') for entry in daily_qs if entry['date']]
+    daily_data = [entry['count'] for entry in daily_qs if entry['date']]
+    
     context = {
         'registrations': processed_registrations,
+        'daily_labels_json': json.dumps(daily_labels),
+        'daily_data_json': json.dumps(daily_data),
         'filters': {
             # 'college_code': college_code_filter,
             'team_size': team_size_filter,
