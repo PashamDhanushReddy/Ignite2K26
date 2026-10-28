@@ -212,13 +212,12 @@
                     class="w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md transition-opacity duration-700"
                     aria-hidden="true">
 
-                <!-- Background Video for Mobile & Tablet -->
+                <!-- Background Video for Mobile & Tablet (Transparent WebM) -->
                 <video id="mobileHeroBgVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
                     preload="auto" disablepictureinpicture disableremoteplayback
                     poster="{% static 'web/images/hero_poster.png' %}"
                     class="absolute inset-0 m-auto w-full h-full max-w-xl md:max-w-2xl object-contain object-center scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md opacity-90 transition-opacity duration-700"
                     aria-hidden="true">
-                    <source src="{% static 'web/images/bg_video.mp4' %}" type="video/mp4">
                     <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
                 </video>
             </div>
@@ -394,13 +393,12 @@
                                 alt="Ignite 2K27 Student Innovation and Robotics Showcase"
                                 class="w-full h-auto max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-all duration-700 hover:scale-[1.12]">
 
-                            <!-- Cross-Device Hero Video (Plays smoothly on Mobile, Tablet & Desktop) -->
+                            <!-- Cross-Device Hero Video (Transparent WebM) -->
                             <video id="heroVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
                                 preload="auto" disablepictureinpicture disableremoteplayback
                                 poster="{% static 'web/images/hero_poster.png' %}"
                                 class="absolute inset-0 m-auto w-full h-full max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-opacity duration-700 opacity-0 pointer-events-none hover:scale-[1.12]"
                                 aria-label="Ignite 2K27 Student Innovation and Robotics Showcase">
-                                <source src="{% static 'web/images/bg_video.mp4' %}" type="video/mp4">
                                 <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
                             </video>
                         </div>
@@ -1146,7 +1144,20 @@
                 const img = document.getElementById(imgId);
                 if (!vid) return;
 
-                // iOS & Android require explicit muted and playsinline properties
+                // Apple WebKit/Safari does NOT support WebM alpha transparency and renders the alpha channel as solid black.
+                // On Apple devices, keep the crisp, transparent hero_poster.png fallback so there is never an ugly black/white box.
+                const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                                      (navigator.userAgent.includes('Mac') && ('ontouchend' in document || navigator.maxTouchPoints > 0)) ||
+                                      (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
+                if (isAppleDevice) {
+                    vid.classList.add('hidden');
+                    if (img) {
+                        img.classList.remove('opacity-0', 'hidden');
+                    }
+                    return;
+                }
+
+                // Explicit muted and playsinline properties for cross-platform autoplay
                 vid.muted = true;
                 vid.defaultMuted = true;
                 vid.playsInline = true;
