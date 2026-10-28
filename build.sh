@@ -2,7 +2,9 @@
 # Exit on error
 set -o errexit
 
-pip install -r requirements.txt
+# Upgrade pip to support modern binary wheels
+pip install --upgrade pip setuptools wheel
+pip install --prefer-binary -r requirements.txt
 
 python manage.py collectstatic --no-input
 python manage.py migrate

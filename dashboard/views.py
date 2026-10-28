@@ -9,7 +9,7 @@ import urllib.parse
 import csv
 import json
 from datetime import datetime
-import pandas as pd
+import openpyxl
 from io import BytesIO
 from django.utils.dateparse import parse_datetime
 from django.db.models import Q
@@ -380,14 +380,24 @@ def export_registrations_view(request):
                     base_row[f'Member {i} Role'] = 'Team Leader' if member['is_leader'] else 'Member'
             detailed_rows.append(base_row)
             
-        df = pd.DataFrame(detailed_rows)
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = 'Registrations'
         
-        # Remove timezone from datetimes
-        if 'Registration Date' in df.columns:
-            df['Registration Date'] = df['Registration Date'].apply(lambda x: x.replace(tzinfo=None) if x else x)
+        if detailed_rows:
+            headers = list(detailed_rows[0].keys())
+            ws.append(headers)
+            for row in detailed_rows:
+                row_vals = []
+                for h in headers:
+                    val = row.get(h)
+                    if hasattr(val, 'tzinfo') and val.tzinfo is not None:
+                        val = val.replace(tzinfo=None)
+                    row_vals.append(val)
+                ws.append(row_vals)
+                
         output = BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Registrations')
+        wb.save(output)
         output.seek(0)
         
         response = HttpResponse(
