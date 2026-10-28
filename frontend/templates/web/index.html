@@ -206,17 +206,17 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/60 z-10">
                 </div>
 
-                <!-- Fallback Background Image for Mobile/Tablet -->
+                <!-- Fallback Background Image for Mobile/Tablet (Shown ONLY if video cannot play) -->
                 <img id="mobileHeroBgImg" src="{% static 'web/images/hero_poster.png' %}"
                     alt="Ignite 2K27 Expo Background"
-                    class="w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md transition-opacity duration-700"
+                    class="hidden w-full h-full max-w-xl object-contain object-center opacity-90 scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md"
                     aria-hidden="true">
 
-                <!-- Background Video for Mobile & Tablet (Transparent WebM) -->
+                <!-- Background Video for Mobile & Tablet (Transparent WebM - First Priority) -->
                 <video id="mobileHeroBgVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
                     preload="auto" disablepictureinpicture disableremoteplayback
                     poster="{% static 'web/images/hero_poster.png' %}"
-                    class="absolute inset-0 m-auto w-full h-full max-w-xl md:max-w-2xl object-contain object-center scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md opacity-90 transition-opacity duration-700"
+                    class="w-full h-full max-w-xl md:max-w-2xl object-contain object-center scale-110 sm:scale-100 transform translate-y-4 filter drop-shadow-md opacity-90 transition-opacity duration-700"
                     aria-hidden="true">
                     <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
                 </video>
@@ -388,16 +388,16 @@
                                 class="absolute bottom-1 inset-x-4 lg:inset-x-8 h-10 bg-gradient-to-r from-transparent via-rose-300/35 to-transparent blur-lg -z-10 pointer-events-none rounded-full">
                             </div>
 
-                            <!-- Fallback Hero Poster (Displayed instantly while video buffers or if video cannot play) -->
+                            <!-- Fallback Hero Poster (Displayed ONLY if video cannot play) -->
                             <img id="heroImage" src="{% static 'web/images/hero_poster.png' %}"
                                 alt="Ignite 2K27 Student Innovation and Robotics Showcase"
-                                class="w-full h-auto max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-all duration-700 hover:scale-[1.12]">
+                                class="hidden w-full h-auto max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-all duration-700 hover:scale-[1.12]">
 
-                            <!-- Cross-Device Hero Video (Transparent WebM) -->
+                            <!-- Cross-Device Hero Video (Transparent WebM - First Priority) -->
                             <video id="heroVideo" autoplay loop muted playsinline webkit-playsinline x5-playsinline
                                 preload="auto" disablepictureinpicture disableremoteplayback
                                 poster="{% static 'web/images/hero_poster.png' %}"
-                                class="absolute inset-0 m-auto w-full h-full max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-opacity duration-700 opacity-0 pointer-events-none hover:scale-[1.12]"
+                                class="w-full h-auto max-h-[320px] sm:max-h-[420px] lg:max-h-[580px] xl:max-h-[660px] 2xl:max-h-[740px] lg:scale-105 xl:scale-110 object-contain drop-shadow-[0_25px_45px_rgba(255,59,92,0.18)] transition-transform duration-500 hover:scale-[1.12]"
                                 aria-label="Ignite 2K27 Student Innovation and Robotics Showcase">
                                 <source src="{% static 'web/images/bg_video.webm' %}" type="video/webm">
                             </video>
@@ -1139,21 +1139,33 @@
                 setTimeout(runTypewriter, 2000);
             }
             // Universal Cross-Device Hero Video Engine (Desktop, Tablet, Mobile)
+            // Priority: Video is first priority. Fallback image is shown ONLY if video cannot play.
             function initHeroVideoPair(vidId, imgId) {
                 const vid = document.getElementById(vidId);
                 const img = document.getElementById(imgId);
                 if (!vid) return;
 
+                function showFallback() {
+                    vid.classList.add('hidden');
+                    if (img) {
+                        img.classList.remove('hidden');
+                    }
+                }
+
+                function showVideo() {
+                    vid.classList.remove('hidden');
+                    if (img) {
+                        img.classList.add('hidden');
+                    }
+                }
+
                 // Apple WebKit/Safari does NOT support WebM alpha transparency and renders the alpha channel as solid black.
-                // On Apple devices, keep the crisp, transparent hero_poster.png fallback so there is never an ugly black/white box.
+                // On Apple devices, keep the crisp, transparent hero_poster.png fallback so there is never an ugly black box.
                 const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                                       (navigator.userAgent.includes('Mac') && ('ontouchend' in document || navigator.maxTouchPoints > 0)) ||
                                       (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
                 if (isAppleDevice) {
-                    vid.classList.add('hidden');
-                    if (img) {
-                        img.classList.remove('opacity-0', 'hidden');
-                    }
+                    showFallback();
                     return;
                 }
 
@@ -1166,40 +1178,31 @@
                 vid.setAttribute('webkit-playsinline', '');
                 vid.setAttribute('x5-playsinline', '');
 
-                function onActive() {
-                    vid.classList.remove('opacity-0');
-                    if (img) {
-                        setTimeout(() => {
-                            if (!vid.paused && vid.currentTime > 0) {
-                                img.classList.add('opacity-0');
-                            }
-                        }, 500);
-                    }
-                }
+                // Video is first priority
+                showVideo();
 
-                vid.addEventListener('playing', onActive);
-                vid.addEventListener('timeupdate', () => {
-                    if (vid.currentTime > 0.01) {
-                        onActive();
-                    }
-                });
+                // If video encounters an error, switch to fallback image
+                vid.addEventListener('error', showFallback);
+                vid.addEventListener('playing', showVideo);
 
                 function attemptPlay() {
                     vid.muted = true;
                     const p = vid.play();
                     if (p !== undefined) {
                         p.then(() => {
-                            onActive();
+                            showVideo();
                         }).catch(() => {
-                            // Autoplay blocked by mobile battery-saver or policy:
-                            // Poster image is already displaying as fallback.
-                            // Trigger instant playback on user's first touch or scroll!
+                            // Autoplay blocked by mobile battery-saver:
+                            // Poster is already showing natively inside the video element.
+                            // Unlock on user's first touch or scroll!
                             const unlock = () => {
                                 vid.muted = true;
                                 vid.play().then(() => {
-                                    onActive();
+                                    showVideo();
                                     removeUnlockListeners();
-                                }).catch(() => {});
+                                }).catch(() => {
+                                    showFallback();
+                                });
                             };
                             const removeUnlockListeners = () => {
                                 ['touchstart', 'touchend', 'pointerdown', 'scroll', 'click'].forEach(evt => {
